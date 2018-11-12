@@ -375,11 +375,12 @@ farming_super.register_plant = function(name, def)
 				
 				local dropname = "p"..tierCount.."s"..tierStep.."t"..tier
 				local drops = def_drops[dropname] or def.default_drop
+				local tex = def.textures[dropname] or (mname.."_"..pname.."_"..tierCount.."_"..tierStep.."_"..tier..".png")
 				
 				minetest.register_node(name, {
 					drawtype = "plantlike",
 					waving = false,
-					tiles = {mname .. "_" .. pname .. "_"..step.."_"..tier..".png"},
+					tiles = {tex},
 					paramtype = "light",
 					paramtype2 = def.paramtype2 or nil,
 					place_param2 = def.place_param2 or nil,

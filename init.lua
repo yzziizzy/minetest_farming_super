@@ -7,6 +7,7 @@ dofile(modpath.."/api.lua")
 
 
 -- todo: pests
+-- todo: nutrient depletion
 
 
 
@@ -54,6 +55,21 @@ farming_super.register_plant("farming_super:corn", {
 	drops = {
 		p4s2t2 = corndrop, -- phase 4, step 2, tier 2
 		p4s2t3 = corndrop,
+	},
+	textures = { -- overrides default texture naming, allowing reuse
+		p2s1t2 = "farming_super_corn_1_2_1.png", 
+		
+		p3s1t1 = "farming_super_corn_2_1_1.png", 
+		p3s1t2 = "farming_super_corn_2_1_1.png", 
+		p3s1t3 = "farming_super_corn_1_2_1.png", 
+		
+		p4s1t1 = "farming_super_corn_2_1_1.png", 
+		p4s1t2 = "farming_super_corn_2_1_1.png", 
+		p4s1t3 = "farming_super_corn_2_1_1.png", 
+		p4s1t4 = "farming_super_corn_1_2_1.png", 
+		
+		p4s2t1 = "farming_super_corn_2_1_1.png", 
+		p4s2t3 = "farming_super_corn_4_2_2.png", 
 	},
 	minlight = 13,
 	maxlight = 15,
