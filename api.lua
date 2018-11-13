@@ -163,6 +163,21 @@ local function install_plant(def, pos, step)
 end
 
 
+local function get_seed_variant(def, nitro)
+	if not def.seed_variants then
+		return def.base_plant
+	end
+	
+	
+	for _,v in pairs(def.seed_variants) do
+		if v.minNitrogen <= nitro and v.maxNitrogen >= nitro then
+			return v.name
+		end
+	end
+	
+	return def.base_plant
+end
+
 
 farming_super.grow_plant = function(pos, elapsed)
 	local node = minetest.get_node(pos)
@@ -172,12 +187,10 @@ print("gp name ".. name)
 	local bp = def.base_plant
 	print("base_plant ".. bp)
 	print("next_growth_step ".. (def.next_growth_step or "end"))
--- 	if not def.next_plant then
--- 		-- disable timer for fully grown plant
--- 		return
--- 	end
 
 
+	
+	
 	-- grow seed
 	if minetest.get_item_group(node.name, "seed") and def.fertility then
 		local soil_node = minetest.get_node_or_nil({x = pos.x, y = pos.y - 1, z = pos.z})
@@ -185,11 +198,27 @@ print("gp name ".. name)
 			tick_again(pos)
 			return
 		end
+		
 		-- omitted is a check for light, we assume seeds can germinate in the dark.
 		for _, v in pairs(def.fertility) do
 			if minetest.get_item_group(soil_node.name, v) ~= 0 then
 				
-				install_plant(def, pos, 1)
+				local soil_meta = minetest.get_meta({x=pos.x, y=pos.y-1, z=pos.z})
+				local nlevel = soil_meta:get_int("nitrogen")
+				if nlevel == 0 then
+					nlevel = 12
+					soil_meta:set_int("nitrogen", nlevel)
+				end
+				
+				local var_name = get_seed_variant(def, nlevel) .. "_1_1"
+				local var_def = minetest.registered_items[var_name]
+				print(dump2(var_def))
+				if var_name == "death" or var_def == nil then
+					minetest.set_node(pos, {name="air"})
+					return
+				end
+				
+				install_plant(var_def, pos, 1)
 				
 				--[[local placenode = {name = def.base_plant .. "_1_1"}
 				if def.place_param2 then
@@ -197,7 +226,8 @@ print("gp name ".. name)
 				end
 				]] -- minetest.swap_node(pos, placenode)
 			--	if minetest.registered_nodes[def.base_plant .. "_1_1"].next_plant then
-					tick(pos)
+				tick(pos)
+				return
 			--		return
 			--	end
 			end
@@ -288,63 +318,68 @@ farming_super.register_plant = function(name, def)
 	
 
 	-- Register seed
-	local lbm_nodes = {mname .. ":seed_" .. pname}
 	local g = {seed = 1, snappy = 3, attached_node = 1, flammable = 2}
 	for k, v in pairs(def.fertility) do
 		g[v] = 1
 	end
-	minetest.register_node(":" .. mname .. ":seed_" .. pname, {
-		description = def.description,
-		tiles = {def.inventory_image},
-		inventory_image = def.inventory_image,
-		wield_image = def.inventory_image,
-		drawtype = "signlike",
-		groups = g,
-		paramtype = "light",
-		paramtype2 = "wallmounted",
-		place_param2 = def.place_param2 or nil, -- this isn't actually used for placement
-		--walkable = false,
-		sunlight_propagates = true,
-		selection_box = {
-			type = "fixed",
-			fixed = {-0.5, -0.5, -0.5, 0.5, -5/16, 0.5},
-		},
-		fertility = def.fertility,
-		sounds = default.node_sound_dirt_defaults({
-			dig = {name = "", gain = 0},
-			dug = {name = "default_grass_footstep", gain = 0.2},
-			place = {name = "default_place_node", gain = 0.25},
-		}),
-		base_plant = base_plant,
-		next_growth_step = 1,
-		tier_count = 1,
-		groups = {snappy = 3},
+	
+	if not def.no_seed then
+		minetest.register_node(":" .. mname .. ":seed_" .. pname, {
+			description = def.description,
+			tiles = {def.inventory_image},
+			inventory_image = def.inventory_image,
+			wield_image = def.inventory_image,
+			drawtype = "signlike",
+			groups = g,
+			paramtype = "light",
+			paramtype2 = "wallmounted",
+			place_param2 = def.place_param2 or nil, -- this isn't actually used for placement
+			--walkable = false,
+			sunlight_propagates = true,
+			selection_box = {
+				type = "fixed",
+				fixed = {-0.5, -0.5, -0.5, 0.5, -5/16, 0.5},
+			},
+			fertility = def.fertility,
+			sounds = default.node_sound_dirt_defaults({
+				dig = {name = "", gain = 0},
+				dug = {name = "default_grass_footstep", gain = 0.2},
+				place = {name = "default_place_node", gain = 0.25},
+			}),
+			base_plant = base_plant,
+			next_growth_step = 1,
+			tier_count = 1,
+			groups = {snappy = 3},
 
-		on_place = function(itemstack, placer, pointed_thing)
-			local under = pointed_thing.under
-			local node = minetest.get_node(under)
-			local udef = minetest.registered_nodes[node.name]
-			if udef and udef.on_rightclick and
-					not (placer and placer:is_player() and
-					placer:get_player_control().sneak) then
-				return udef.on_rightclick(under, node, placer, itemstack,
-					pointed_thing) or itemstack
-			end
+			on_place = function(itemstack, placer, pointed_thing)
+				local under = pointed_thing.under
+				local node = minetest.get_node(under)
+				local udef = minetest.registered_nodes[node.name]
+				if udef and udef.on_rightclick and
+						not (placer and placer:is_player() and
+						placer:get_player_control().sneak) then
+					return udef.on_rightclick(under, node, placer, itemstack,
+						pointed_thing) or itemstack
+				end
 
-			return farming_super.place_seed(itemstack, placer, pointed_thing, mname .. ":seed_" .. pname)
-		end,
-		--next_plant = mname .. ":" .. pname .. "_1",
-		on_timer = farming_super.grow_plant,
-		minlight = def.minlight,
-		maxlight = def.maxlight,
-	})
+				return farming_super.place_seed(itemstack, placer, pointed_thing, mname .. ":seed_" .. pname)
+			end,
+			--next_plant = mname .. ":" .. pname .. "_1",
+			on_timer = farming_super.grow_plant,
+			minlight = def.minlight,
+			maxlight = def.maxlight,
+			seed_variants = def.seed_variants,
+		})
+	end
 
-	-- Register harvest
-	minetest.register_craftitem(":" .. mname .. ":" .. pname, {
-		description = pname:gsub("^%l", string.upper),
-		inventory_image = mname .. "_" .. pname .. ".png",
-		groups = {flammable = 2},
-	})
+	if not def.no_harvest then
+		-- Register harvest
+		minetest.register_craftitem(":" .. mname .. ":" .. pname, {
+			description = pname:gsub("^%l", string.upper),
+			inventory_image = mname .. "_" .. pname .. ".png",
+			groups = {flammable = 2},
+		})
+	end
 
 	local next_node = {
 		[mname .. ":seed_" .. pname] = mname .. ":" .. pname .. "_1_1"
@@ -359,6 +394,11 @@ farming_super.register_plant = function(name, def)
 		totalSteps = totalSteps + numSteps
 	end
 	print("total steps " .. totalSteps)
+	
+	local tex_base = mname.."_"..pname
+	if def.textures and def.textures.base then
+		tex_base = def.textures.base
+	end
 	
 	local step = 1
 	for tierCount,numSteps in ipairs(def.steps) do
@@ -375,7 +415,7 @@ farming_super.register_plant = function(name, def)
 				
 				local dropname = "p"..tierCount.."s"..tierStep.."t"..tier
 				local drops = def_drops[dropname] or def.default_drop
-				local tex = def.textures[dropname] or (mname.."_"..pname.."_"..tierCount.."_"..tierStep.."_"..tier..".png")
+				local tex = def.textures[dropname] or (tex_base.."_"..tierCount.."_"..tierStep.."_"..tier..".png")
 				
 				minetest.register_node(name, {
 					drawtype = "plantlike",
