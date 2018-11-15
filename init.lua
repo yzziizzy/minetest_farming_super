@@ -99,7 +99,7 @@ local corndrop = {
 -- todo: extra step where corn dries out and gives no fruit but more seeds
 
 
--- smaller corn with less yield
+-- regular corn with standard yield
 farming_super.register_plant("farming_super:corn", {
 	description = "Corn",
 	paramtype2 = "meshoptions",
@@ -131,7 +131,7 @@ farming_super.register_plant("farming_super:corn", {
 	minlight = 13,
 	maxlight = 15,
 	fertility = {"grassland"},
-	groups = {flammable = 4},
+	groups = {flammable = 4, use_nitrogen = 2},
 	place_param2 = 2,
 })
 
@@ -172,12 +172,12 @@ farming_super.register_plant("farming_super:corn_sm", {
 	minlight = 13,
 	maxlight = 15,
 	fertility = {"grassland"},
-	groups = {flammable = 4},
+	groups = {flammable = 4, use_nitrogen = 1},
 	place_param2 = 2,
 })
 
 
-
+-- large corn with large yield
 farming_super.register_plant("farming_super:corn_lg", {
 	description = "Corn",
 	paramtype2 = "meshoptions",
@@ -209,11 +209,39 @@ farming_super.register_plant("farming_super:corn_lg", {
 	minlight = 13,
 	maxlight = 15,
 	fertility = {"grassland"},
-	groups = {flammable = 4},
+	groups = {flammable = 4, use_nitrogen = 3},
 	place_param2 = 2,
 })
 
 
+
+
+
+-- standard soybeans
+farming_super.register_plant("farming_super:soybeans", {
+	description = "Soybeans",
+	paramtype2 = "meshoptions",
+	place_param2 = 1,
+	inventory_image = "farming_super_seed_soybeans.png",
+	steps = {5}, -- phases, steps per tier 
+	default_drop = {},
+	drops = {
+		p1s5t1 = {
+			max_items = 5,
+			items = {
+				{ items = {'farming_super:seed_soybeans'} },
+				{ items = {'farming_super:seed_soybeans'}, rarity = 2},
+				{ items = {'farming_super:seed_soybeans'}, rarity = 5},
+				{ items = {'farming_super:soybeans 2'} },
+				{ items = {'farming_super:soybeans'}, rarity = 3 }
+			}
+		}, 
+	},
+	minlight = 13,
+	maxlight = 15,
+	fertility = {"grassland"},
+	groups = {flammable = 4, fix_nitrogen = 1},
+})
 
 
 

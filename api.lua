@@ -220,6 +220,10 @@ print("gp name ".. name)
 				
 				install_plant(var_def, pos, 1)
 				
+				if var_def.groups.use_nitrogen then
+					soil_meta:set_int("nitrogen", math.max(1, nlevel - var_def.groups.use_nitrogen))
+				end
+				
 				--[[local placenode = {name = def.base_plant .. "_1_1"}
 				if def.place_param2 then
 					placenode.param2 = def.place_param2
@@ -259,16 +263,16 @@ print("gp name ".. name)
 	
 	-- grow
 	install_plant(def, pos, def.next_growth_step)
--- 	local placenode = {name = def.next_plant}
--- 	if def.place_param2 then
--- 		placenode.param2 = def.place_param2
--- 	end
--- 	minetest.swap_node(pos, placenode)
 
 	-- new timer needed?
-	--if minetest.registered_nodes[def.next_plant].next_plant then
 	if def.next_growth_step then
 		tick(pos)
+	else -- end of growth, give nutrients
+		
+		if def.groups.fix_nitrogen then
+			local nlevel = soil_meta:get_int("nitrogen")
+			soil_meta:set_int("nitrogen", math.min(16, nlevel + def.groups.fix_nitrogen))
+		end
 	end
 	return
 end
@@ -415,7 +419,7 @@ farming_super.register_plant = function(name, def)
 				
 				local dropname = "p"..tierCount.."s"..tierStep.."t"..tier
 				local drops = def_drops[dropname] or def.default_drop
-				local tex = def.textures[dropname] or (tex_base.."_"..tierCount.."_"..tierStep.."_"..tier..".png")
+				local tex = (def.textures and def.textures[dropname]) or (tex_base.."_"..tierCount.."_"..tierStep.."_"..tier..".png")
 				
 				minetest.register_node(name, {
 					drawtype = "plantlike",
