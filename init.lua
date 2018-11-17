@@ -27,7 +27,6 @@ brussels sprouts
 cauliflower
 eggplant
 beans
-soybeans
 celery
 ginger
 colored carrots
@@ -37,6 +36,7 @@ peanuts
 sunflower
 lentils
 hemp
+sorghum
 
 
 much later: 
@@ -52,10 +52,9 @@ sugar processing
 
 TODO: core
 adjustable grow rates per step
-nutrient depletion & fertilizer & nitogen fixation
 pests
 stick or strings for plants to grow on
-"no_seed" option, seed variants based on soil fertility
+
 
 drop-in replacement for farming_plus
 
@@ -221,7 +220,7 @@ farming_super.register_plant("farming_super:corn_lg", {
 farming_super.register_plant("farming_super:soybeans", {
 	description = "Soybeans",
 	paramtype2 = "meshoptions",
-	place_param2 = 1,
+	place_param2 = "X",
 	inventory_image = "farming_super_seed_soybeans.png",
 	steps = {5}, -- phases, steps per tier 
 	default_drop = {},

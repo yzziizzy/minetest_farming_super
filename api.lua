@@ -2,7 +2,43 @@
 farming_super.registered_plants = {}
 
 
+
+
+function deepclone(t)
+	if type(t) ~= "table" then 
+		return t 
+	end
+	
+	local meta = getmetatable(t)
+	local target = {}
+	
+	for k, v in pairs(t) do
+		if type(v) == "table" then
+			target[k] = deepclone(v)
+		else
+			target[k] = v
+		end
+	end
+	
+	setmetatable(target, meta)
+	
+	return target
+end
+
+
+
+
+
+
+
+
+
+
 -- hoes are defined in farming, no need to override here
+
+
+
+
 
 
 local base_speed = 1
@@ -81,7 +117,7 @@ local function cut_whole_plant(pos, oldnode, oldmetadata, digger)
 	local p = {x=pos.x, y=pos.y, z=pos.z}
 	local old_def = minetest.registered_items[oldnode.name]
 	local bn = old_def.base_plant
-	
+	print("cutting bp: ".. bn)
 	local dinv = digger:get_inventory();
 	
 	-- go down
@@ -209,7 +245,7 @@ print("gp name ".. name)
 					nlevel = 12
 					soil_meta:set_int("nitrogen", nlevel)
 				end
-				
+				print("nlevel: " ..nlevel)
 				local var_name = get_seed_variant(def, nlevel) .. "_1_1"
 				local var_def = minetest.registered_items[var_name]
 				print(dump2(var_def))
@@ -222,6 +258,7 @@ print("gp name ".. name)
 				
 				if var_def.groups.use_nitrogen then
 					soil_meta:set_int("nitrogen", math.max(1, nlevel - var_def.groups.use_nitrogen))
+					print("new nlevel: " ..nlevel - (var_def.groups.use_nitrogen or 0))
 				end
 				
 				--[[local placenode = {name = def.base_plant .. "_1_1"}
@@ -268,7 +305,7 @@ print("gp name ".. name)
 	if def.next_growth_step then
 		tick(pos)
 	else -- end of growth, give nutrients
-		
+		local soil_meta = minetest.get_meta({x = pos.x, y = pos.y - 1, z = pos.z})
 		if def.groups.fix_nitrogen then
 			local nlevel = soil_meta:get_int("nitrogen")
 			soil_meta:set_int("nitrogen", math.min(16, nlevel + def.groups.fix_nitrogen))
@@ -310,12 +347,16 @@ farming_super.register_plant = function(name, def)
 		def.fertility = {}
 	end
 
-	if def.place_param2 == "hex" then
+	if def.place_param2 == "plus" then
+		def.place_param2 = 1
+	elseif def.place_param2 == "hex" then
 		def.place_param2 = 2 
 	elseif def.place_param2 == "hatch" then
 		def.place_param2 = 3 -- the shape of #
 	elseif def.place_param2 == "V" or def.place_param2 == "v" then
 		def.place_param2 = 4 -- used by dry_shrub
+	elseif def.place_param2 == "X" or def.place_param2 == "x" then
+		def.place_param2 = 0 -- regular plants
 	end
 	
 	local base_plant = mname .. ":" .. pname
@@ -325,6 +366,9 @@ farming_super.register_plant = function(name, def)
 	local g = {seed = 1, snappy = 3, attached_node = 1, flammable = 2}
 	for k, v in pairs(def.fertility) do
 		g[v] = 1
+	end
+	for k, v in pairs(def.groups) do
+		g[k] = v
 	end
 	
 	if not def.no_seed then
@@ -353,7 +397,7 @@ farming_super.register_plant = function(name, def)
 			base_plant = base_plant,
 			next_growth_step = 1,
 			tier_count = 1,
-			groups = {snappy = 3},
+			groups = g,
 
 			on_place = function(itemstack, placer, pointed_thing)
 				local under = pointed_thing.under
@@ -435,7 +479,7 @@ farming_super.register_plant = function(name, def)
 						type = "fixed",
 						fixed = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
 					},
-					groups = {snappy = 3},
+					groups = g,
 					sounds = default.node_sound_leaves_defaults(),
 					next_growth_step = ns,
 					tier_count = tierCount,
@@ -467,6 +511,42 @@ farming_super.register_plant = function(name, def)
 	farming_super.registered_plants[pname] = def
 
 
+	--[[ 
+	for i = 1, 5 do
+		minetest.override_item("default:grass_"..i, {drop = {
+			max_items = 1,
+			items = {
+				{items = {'farming:seed_wheat'},rarity = 5},
+				{items = {'default:grass_1'}},
+			}
+		}})
+	end
+]]
+
+	if not def.no_seed then
+
+		local old_grass_drops = deepclone(minetest.registered_items["default:junglegrass"].drop)
+		print('+++++++++++++++++++++++++++++++++++++++++++')
+		table.insert(old_grass_drops.items, 1, {items={mname .. ":seed_" .. pname}, rarity=2})
+		table.sort(old_grass_drops.items, function(a, b) return (b.rarity or 0) < (a.rarity or 0) end)
+		
+		minetest.override_item("default:junglegrass", {drop = old_grass_drops})
+ 		print(dump(minetest.registered_items["default:junglegrass"]))
+
+	end
+	
+--  	minetest.override_item("default:junglegrass", {drop = old_grass_drops})
+--  
+--  	minetest.override_item("default:junglegrass", {drop = {
+-- 		max_items = 1,
+-- 		items = {
+-- 			{items = {mname .. ":seed_" .. pname}},
+-- 		--	{items = {'default:junglegrass'}},
+-- 		}
+-- 	}})
+-- 	
+	
+	
 
 	--[[
 	-- Register growing steps
