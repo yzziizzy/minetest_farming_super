@@ -351,7 +351,7 @@ farming_super.register_plant = function(name, def)
 		def.place_param2 = 1
 	elseif def.place_param2 == "hex" then
 		def.place_param2 = 2 
-	elseif def.place_param2 == "hatch" then
+	elseif def.place_param2 == "hatch" or def.place_param2 == "#" then
 		def.place_param2 = 3 -- the shape of #
 	elseif def.place_param2 == "V" or def.place_param2 == "v" then
 		def.place_param2 = 4 -- used by dry_shrub

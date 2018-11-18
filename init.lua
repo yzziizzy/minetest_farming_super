@@ -244,3 +244,116 @@ farming_super.register_plant("farming_super:soybeans", {
 
 
 
+
+farming_super.register_plant("farming_super:onion_onion", {
+	description = "Yellow Onion",
+	paramtype2 = "meshoptions",
+	place_param2 = "hatch",
+	inventory_image = "farming_super_seed_onion_onion.png",
+	steps = {4}, -- phases, steps per tier 
+	default_drop = {},
+	drops = {
+		p1s4t1 = {
+			max_items = 4,
+			items = {
+				{ items = {'farming_super:seed_onion_onion'} },
+				{ items = {'farming_super:seed_onion_onion'}, rarity = 2},
+				{ items = {'farming_super:seed_onion_onion'}, rarity = 5},
+				{ items = {'farming_super:onion_onion'} },
+			}
+		}, 
+	},
+	textures = { -- overrides default texture naming, allowing reuse
+		base = "farming_super_onion",
+		p1s4t1 = "farming_super_onion_onion_1_4_1.png", 
+	},
+	minlight = 13,
+	maxlight = 15,
+	fertility = {"grassland"},
+	groups = {flammable = 4},
+})
+
+
+farming_super.register_plant("farming_super:onion_white", {
+	description = "White Onion",
+	paramtype2 = "meshoptions",
+	place_param2 = "#",
+	inventory_image = "farming_super_seed_white_onion.png",
+	steps = {4}, -- phases, steps per tier 
+	default_drop = {},
+	drops = {
+		p1s4t1 = {
+			max_items = 4,
+			items = {
+				{ items = {'farming_super:seed_white_onion'} },
+				{ items = {'farming_super:seed_white_onion'}, rarity = 2},
+				{ items = {'farming_super:seed_white_onion'}, rarity = 5},
+				{ items = {'farming_super:onion_white'} },
+			}
+		}, 
+	},
+	textures = { -- overrides default texture naming, allowing reuse
+		base = "farming_super_onion",
+		p1s4t1 = "farming_super_onion_white_1_4_1.png", 
+	},
+	minlight = 13,
+	maxlight = 15,
+	fertility = {"grassland"},
+	groups = {flammable = 4},
+})
+
+
+
+farming_super.register_plant("farming_super:onion_red", {
+	description = "Red Onion",
+	paramtype2 = "meshoptions",
+	place_param2 = "#",
+	inventory_image = "farming_super_seed_red_onion.png",
+	steps = {4}, -- phases, steps per tier 
+	default_drop = {},
+	drops = {
+		p1s4t1 = {
+			max_items = 4,
+			items = {
+				{ items = {'farming_super:seed_red_onion'} },
+				{ items = {'farming_super:seed_red_onion'}, rarity = 2},
+				{ items = {'farming_super:seed_red_onion'}, rarity = 5},
+				{ items = {'farming_super:onion_red'} },
+			}
+		}, 
+	},
+	textures = { -- overrides default texture naming, allowing reuse
+		base = "farming_super_onion",
+		p1s4t1 = "farming_super_onion_red_1_4_1.png", 
+	},
+	minlight = 13,
+	maxlight = 15,
+	fertility = {"grassland"},
+	groups = {flammable = 4},
+})
+
+
+farming_super.register_plant("farming_super:pineapple", {
+	description = "Pineapple",
+	paramtype2 = "meshoptions",
+	place_param2 = "#",
+	inventory_image = "farming_super_pineapple_top.png",
+	steps = {5}, -- phases, steps per tier 
+	default_drop = {},
+	no_seed = true, -- pineapples don't have seeds in practice
+	drops = {
+		p1s5t1 = {
+			max_items = 1,
+			items = {
+				{ items = {'farming_super:pineapple'} },
+			}
+		}, 
+	},
+	minlight = 13,
+	maxlight = 15,
+	fertility = {"grassland", "desert"},
+	groups = {flammable = 4},
+})
+
+
+
