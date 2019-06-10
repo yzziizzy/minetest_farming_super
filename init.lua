@@ -10,38 +10,56 @@ dofile(modpath.."/api.lua")
 --[[
 TODO: crops
 
-sugar beets
-rice
-oats
+artichoke
+asparagus
 barley
+beans
 beets
-cabbage
-sweet potatoes
-peppers
-onions
-garlic
-taro
-radishes, daikon
 broccoli
 brussels sprouts
+cabbage
+canola
+cassava
 cauliflower
-eggplant
-beans
 celery
-ginger
 colored carrots
-okra
-pineapple
-peanuts
-sunflower
-lentils
+eggplant
+garlic
+ginger
 hemp
+jicama
+leeks
+lentils
+lettuce
+mustard
+oats
+okra
+onions
+peanuts
+peppers
+pineapple
+potatoes
+radishes, daikon
+rhubarb
+rice
 sorghum
+squash
+stawberry
+sugar beets
+sugarcane
+sunflower
+sweet potatoes
+taro
+tomato
+turnips
+yams
 
 
-much later: 
+much later:
+	cucumber
 	grapes
 	hops
+	kiwi
 	lotus
 
 
@@ -245,21 +263,21 @@ farming_super.register_plant("farming_super:soybeans", {
 
 
 
-farming_super.register_plant("farming_super:onion_onion", {
+farming_super.register_plant("farming_super:onion_yellow", {
 	description = "Yellow Onion",
 	paramtype2 = "meshoptions",
 	place_param2 = "hatch",
-	inventory_image = "farming_super_seed_onion_onion.png",
+	inventory_image = "farming_super_seed_onion_yellow.png",
 	steps = {4}, -- phases, steps per tier 
 	default_drop = {},
 	drops = {
 		p1s4t1 = {
 			max_items = 4,
 			items = {
-				{ items = {'farming_super:seed_onion_onion'} },
-				{ items = {'farming_super:seed_onion_onion'}, rarity = 2},
-				{ items = {'farming_super:seed_onion_onion'}, rarity = 5},
-				{ items = {'farming_super:onion_onion'} },
+				{ items = {'farming_super:seed_onion_yellow'} },
+				{ items = {'farming_super:seed_onion_yellow'}, rarity = 2},
+				{ items = {'farming_super:seed_onion_yellow'}, rarity = 5},
+				{ items = {'farming_super:onion_yellow'} },
 			}
 		}, 
 	},

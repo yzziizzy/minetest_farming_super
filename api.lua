@@ -242,7 +242,7 @@ print("gp name ".. name)
 				local soil_meta = minetest.get_meta({x=pos.x, y=pos.y-1, z=pos.z})
 				local nlevel = soil_meta:get_int("nitrogen")
 				if nlevel == 0 then
-					nlevel = 12
+					nlevel = 9
 					soil_meta:set_int("nitrogen", nlevel)
 				end
 				print("nlevel: " ..nlevel)
