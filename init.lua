@@ -406,4 +406,37 @@ farming_super.register_plant("farming_super:soybeans", {
 })
 
 
+-- standard cabbage
+farming_super.register_plant("farming_super:cabbage", {
+	description = "Cabbage",
+	paramtype2 = "meshoptions",
+	place_param2 = "X",
+	inventory_image = "farming_super_seed_cabbage.png",
+-- 	visual_scale = 1.3,
+	steps = {4}, -- phases, steps per tier 
+	textures = { -- overrides default texture naming, allowing reuse
+		p1s1t1 = "farming_super_green_pixels_1.png", 
+		p1s2t1 = "farming_super_green_pixels_2.png", 
+		p1s3t1 = "farming_super_cabbage_3.png", 
+		p1s4t1 = "farming_super_cabbage_4.png", 
+	},
+	default_drop = {},
+	drops = {
+		p1s5t1 = {
+			max_items = 4,
+			items = {
+				{ items = {'farming_super:seed_cabbage'} },
+				{ items = {'farming_super:seed_cabbage'}, rarity = 2},
+				{ items = {'farming_super:seed_cabbage'}, rarity = 5},
+				{ items = {'farming_super:cabbage'} },
+			}
+		}, 
+	},
+	minlight = 10,
+	maxlight = 15,
+	fertility = {"grassland"},
+	groups = {flammable = 4, },
+})
+
+
 
