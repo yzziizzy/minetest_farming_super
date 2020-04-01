@@ -44,7 +44,7 @@ rhubarb
 rice
 sorghum
 squash
-stawberry
+strawberry
 sugar beets
 sugarcane
 sunflower
@@ -72,6 +72,8 @@ TODO: core
 adjustable grow rates per step
 pests
 stick or strings for plants to grow on
+wilting on low water
+dead version of all plants
 
 
 drop-in replacement for farming_plus
@@ -267,7 +269,7 @@ farming_super.register_plant("farming_super:onion_yellow", {
 	description = "Yellow Onion",
 	paramtype2 = "meshoptions",
 	place_param2 = "hatch",
-	inventory_image = "farming_super_seed_onion_yellow.png",
+	inventory_image = "farming_super_seed_yellow_onion.png",
 	steps = {4}, -- phases, steps per tier 
 	default_drop = {},
 	drops = {
@@ -283,7 +285,7 @@ farming_super.register_plant("farming_super:onion_yellow", {
 	},
 	textures = { -- overrides default texture naming, allowing reuse
 		base = "farming_super_onion",
-		p1s4t1 = "farming_super_onion_onion_1_4_1.png", 
+		p1s4t1 = "farming_super_onion_yellow_1_4_1.png", 
 	},
 	minlight = 13,
 	maxlight = 15,
@@ -371,6 +373,36 @@ farming_super.register_plant("farming_super:pineapple", {
 	maxlight = 15,
 	fertility = {"grassland", "desert"},
 	groups = {flammable = 4},
+})
+
+
+
+
+-- standard soybeans
+farming_super.register_plant("farming_super:soybeans", {
+	description = "Soybeans",
+	paramtype2 = "meshoptions",
+	place_param2 = "X",
+	inventory_image = "farming_super_seed_soybeans.png",
+-- 	visual_scale = 1.3,
+	steps = {5}, -- phases, steps per tier 
+	default_drop = {},
+	drops = {
+		p1s5t1 = {
+			max_items = 5,
+			items = {
+				{ items = {'farming_super:seed_soybeans'} },
+				{ items = {'farming_super:seed_soybeans'}, rarity = 2},
+				{ items = {'farming_super:seed_soybeans'}, rarity = 5},
+				{ items = {'farming_super:soybeans 2'} },
+				{ items = {'farming_super:soybeans'}, rarity = 3 }
+			}
+		}, 
+	},
+	minlight = 13,
+	maxlight = 15,
+	fertility = {"grassland"},
+	groups = {flammable = 4, fix_nitrogen = 1},
 })
 
 

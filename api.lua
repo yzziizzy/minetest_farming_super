@@ -117,7 +117,6 @@ local function cut_whole_plant(pos, oldnode, oldmetadata, digger)
 	local p = {x=pos.x, y=pos.y, z=pos.z}
 	local old_def = minetest.registered_items[oldnode.name]
 	local bn = old_def.base_plant
-	print("cutting bp: ".. bn)
 	local dinv = digger:get_inventory();
 	
 	-- go down
@@ -138,7 +137,7 @@ local function cut_whole_plant(pos, oldnode, oldmetadata, digger)
 		for _, stack in ipairs(drops) do
 			dinv:add_item("main", stack)
 		end
-				
+		
 		minetest.set_node(p, {name="air"})
 	end
 	
@@ -174,7 +173,6 @@ local function install_plant(def, pos, step)
 	end
 
 	local bp = def.base_plant
-	print("tc ".. def.tier_count)
 	local tc = def.tier_count
 	
 	local pos2 = {x=pos.x, y=pos.y, z=pos.z}
@@ -191,6 +189,7 @@ local function install_plant(def, pos, step)
 		if new_def.place_param2 then
 			placenode.param2 = new_def.place_param2
 		end
+		
 		minetest.swap_node(pos2, placenode)
 		
 		pos2.y = pos2.y + 1
@@ -219,7 +218,6 @@ farming_super.grow_plant = function(pos, elapsed)
 	local node = minetest.get_node(pos)
 	local name = node.name
 	local def = minetest.registered_nodes[name]
-print("gp name ".. name)
 	local bp = def.base_plant
 	print("base_plant ".. bp)
 	print("next_growth_step ".. (def.next_growth_step or "end"))
@@ -248,7 +246,7 @@ print("gp name ".. name)
 				print("nlevel: " ..nlevel)
 				local var_name = get_seed_variant(def, nlevel) .. "_1_1"
 				local var_def = minetest.registered_items[var_name]
-				print(dump2(var_def))
+				
 				if var_name == "death" or var_def == nil then
 					minetest.set_node(pos, {name="air"})
 					return
@@ -362,13 +360,16 @@ farming_super.register_plant = function(name, def)
 	local base_plant = mname .. ":" .. pname
 	
 
-	-- Register seed
+	-- Register seed -- attached node needs not be on 2nd tier nodes
 	local g = {seed = 1, snappy = 3, attached_node = 1, flammable = 2}
+	local g2 = {seed = 1, snappy = 3, flammable = 2}
 	for k, v in pairs(def.fertility) do
 		g[v] = 1
+		g2[v] = 1
 	end
 	for k, v in pairs(def.groups) do
 		g[k] = v
+		g2[k] = v
 	end
 	
 	if not def.no_seed then
@@ -386,7 +387,7 @@ farming_super.register_plant = function(name, def)
 			sunlight_propagates = true,
 			selection_box = {
 				type = "fixed",
-				fixed = {-0.5, -0.5, -0.5, 0.5, -5/16, 0.5},
+				fixed = {-0.5, -0.5, -0.5, 0.5, -0.375, 0.5},
 			},
 			fertility = def.fertility,
 			sounds = default.node_sound_dirt_defaults({
@@ -441,7 +442,7 @@ farming_super.register_plant = function(name, def)
 	for _,numSteps in ipairs(def.steps) do
 		totalSteps = totalSteps + numSteps
 	end
-	print("total steps " .. totalSteps)
+-- 	print("total steps " .. totalSteps)
 	
 	local tex_base = mname.."_"..pname
 	if def.textures and def.textures.base then
@@ -465,6 +466,11 @@ farming_super.register_plant = function(name, def)
 				local drops = def_drops[dropname] or def.default_drop
 				local tex = (def.textures and def.textures[dropname]) or (tex_base.."_"..tierCount.."_"..tierStep.."_"..tier..".png")
 				
+				local gg = g2
+				if tier == 1 then
+					gg = g
+				end
+				
 				minetest.register_node(name, {
 					drawtype = "plantlike",
 					waving = false,
@@ -477,9 +483,9 @@ farming_super.register_plant = function(name, def)
 					drop = drops,
 					selection_box = {
 						type = "fixed",
-						fixed = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+						fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 0.5, 6 / 16},
 					},
-					groups = g,
+					groups = gg,
 					sounds = default.node_sound_leaves_defaults(),
 					next_growth_step = ns,
 					tier_count = tierCount,
@@ -491,13 +497,22 @@ farming_super.register_plant = function(name, def)
 					after_dig_node = cut_whole_plant,
 				})
 				
+				
+				--[[
+				if minetest.global_exists("seasons") then
+					seasons.reg_custom("fall", name, dead_vine_name)
+					seasons.reg_custom("winter", vine_name, "air")
+				end
+				]]
+				
+				
 				if last then
 					next_node[last] = name
 					stack_height[last] = step
 				end
 				
 				last = name
-
+				
 			end
 			
 			step = step + 1
@@ -507,7 +522,7 @@ farming_super.register_plant = function(name, def)
 	
 	def.next_node = next_node
 	def.stack_height = stack_height
-	print("def name "..pname)
+-- 	print("def name "..pname)
 	farming_super.registered_plants[pname] = def
 
 
@@ -526,12 +541,12 @@ farming_super.register_plant = function(name, def)
 	if not def.no_seed then
 
 		local old_grass_drops = deepclone(minetest.registered_items["default:junglegrass"].drop)
-		print('+++++++++++++++++++++++++++++++++++++++++++')
+-- 		print('+++++++++++++++++++++++++++++++++++++++++++')
 		table.insert(old_grass_drops.items, 1, {items={mname .. ":seed_" .. pname}, rarity=2})
 		table.sort(old_grass_drops.items, function(a, b) return (b.rarity or 0) < (a.rarity or 0) end)
 		
 		minetest.override_item("default:junglegrass", {drop = old_grass_drops})
- 		print(dump(minetest.registered_items["default:junglegrass"]))
+--  		print(dump(minetest.registered_items["default:junglegrass"]))
 
 	end
 	
