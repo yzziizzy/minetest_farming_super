@@ -17,7 +17,6 @@ beans
 beets
 broccoli
 brussels sprouts
-cabbage
 canola
 cassava
 cauliflower
@@ -26,6 +25,7 @@ colored carrots
 eggplant
 garlic
 ginger
+green onions on harvesting young onions
 hemp
 jicama
 leeks
@@ -55,6 +55,7 @@ turnips
 yams
 
 
+
 much later:
 	cucumber
 	grapes
@@ -66,6 +67,7 @@ much later:
 TODO: features
 corn oil processing
 sugar processing
+
 
 
 TODO: core
@@ -271,6 +273,7 @@ farming_super.register_plant("farming_super:onion_yellow", {
 	place_param2 = "hatch",
 	inventory_image = "farming_super_seed_yellow_onion.png",
 	steps = {4}, -- phases, steps per tier 
+	step_len = {1, 2, 3, 4},
 	default_drop = {},
 	drops = {
 		p1s4t1 = {
@@ -300,6 +303,7 @@ farming_super.register_plant("farming_super:onion_white", {
 	place_param2 = "#",
 	inventory_image = "farming_super_seed_white_onion.png",
 	steps = {4}, -- phases, steps per tier 
+	step_len = {1, 2, 3, 4},
 	default_drop = {},
 	drops = {
 		p1s4t1 = {
@@ -330,6 +334,7 @@ farming_super.register_plant("farming_super:onion_red", {
 	place_param2 = "#",
 	inventory_image = "farming_super_seed_red_onion.png",
 	steps = {4}, -- phases, steps per tier 
+	step_len = {1, 2, 3, 4},
 	default_drop = {},
 	drops = {
 		p1s4t1 = {

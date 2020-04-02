@@ -44,12 +44,12 @@ end
 local base_speed = 1
 
 -- how often node timers for plants will tick, +/- some random value
-local function tick(pos)
-	minetest.get_node_timer(pos):start(math.random(base_speed * 2, base_speed * 3))
+local function tick(pos, mul)
+	minetest.get_node_timer(pos):start(math.random(base_speed * 2 * mul, base_speed * 3 * mul))
 end
 -- how often a growth failure tick is retried (e.g. too dark)
-local function tick_again(pos)
-	minetest.get_node_timer(pos):start(math.random(base_speed, base_speed * 2))
+local function tick_again(pos, mul)
+	minetest.get_node_timer(pos):start(math.random(base_speed * mul, base_speed * 2 * mul))
 end
 
 -- Seed placement
@@ -102,7 +102,7 @@ farming_super.place_seed = function(itemstack, placer, pointed_thing, plantname)
 
 	-- add the node and remove 1 item from the itemstack
 	minetest.add_node(pt.above, {name = plantname, param2 = 1})
-	tick(pt.above)
+	tick(pt.above, minetest.registered_nodes[plantname].step_len)
 	if not (creative and creative.is_enabled_for
 			and creative.is_enabled_for(player_name)) then
 		itemstack:take_item()
@@ -229,7 +229,7 @@ farming_super.grow_plant = function(pos, elapsed)
 	if minetest.get_item_group(node.name, "seed") and def.fertility then
 		local soil_node = minetest.get_node_or_nil({x = pos.x, y = pos.y - 1, z = pos.z})
 		if not soil_node then
-			tick_again(pos)
+			tick_again(pos, def.step_len)
 			return
 		end
 		
@@ -265,7 +265,7 @@ farming_super.grow_plant = function(pos, elapsed)
 				end
 				]] -- minetest.swap_node(pos, placenode)
 			--	if minetest.registered_nodes[def.base_plant .. "_1_1"].next_plant then
-				tick(pos)
+				tick(pos, def.step_len)
 				return
 			--		return
 			--	end
@@ -281,7 +281,7 @@ farming_super.grow_plant = function(pos, elapsed)
 	-- check if on wet soil
 	local below = minetest.get_node({x = pos.x, y = pos.y - 1, z = pos.z})
 	if minetest.get_item_group(below.name, "soil") < 3 then
-		tick_again(pos)
+		tick_again(pos, def.step_len)
 		print("not wet")
 		return
 	end
@@ -290,7 +290,7 @@ farming_super.grow_plant = function(pos, elapsed)
 	-- check light
 	local light = minetest.get_node_light(pos)
 	if not light or light < def.minlight or light > def.maxlight then
-		tick_again(pos)
+		tick_again(pos, def.step_len)
 		print("too dim ".. light.. ":"..def.minlight..":"..def.maxlight)
 		return
 	end
@@ -301,7 +301,7 @@ farming_super.grow_plant = function(pos, elapsed)
 
 	-- new timer needed?
 	if def.next_growth_step then
-		tick(pos)
+		tick(pos, def.step_len)
 	else -- end of growth, give nutrients
 		local soil_meta = minetest.get_meta({x = pos.x, y = pos.y - 1, z = pos.z})
 		if def.groups.fix_nitrogen then
@@ -398,6 +398,7 @@ farming_super.register_plant = function(name, def)
 			base_plant = base_plant,
 			next_growth_step = 1,
 			tier_count = 1,
+			step_len = (def.step_len and def.step_len[1]) or 1,
 			groups = g,
 
 			on_place = function(itemstack, placer, pointed_thing)
@@ -490,6 +491,7 @@ farming_super.register_plant = function(name, def)
 					next_growth_step = ns,
 					tier_count = tierCount,
 					base_plant = base_plant,
+					step_len = (def.step_len and def.step_len[step+1]) or 1,
 					on_timer = farming_super.grow_plant,
 					minlight = def.minlight,
 					maxlight = def.maxlight,
