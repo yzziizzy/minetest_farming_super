@@ -34,7 +34,6 @@ lettuce
 mustard
 oats
 okra
-onions
 peanuts
 peppers
 pineapple
@@ -434,6 +433,32 @@ farming_super.register_plant("farming_super:cabbage", {
 				{ items = {'farming_super:seed_cabbage'}, rarity = 2},
 				{ items = {'farming_super:seed_cabbage'}, rarity = 5},
 				{ items = {'farming_super:cabbage'} },
+			}
+		}, 
+	},
+	minlight = 10,
+	maxlight = 15,
+	fertility = {"grassland"},
+	groups = {flammable = 4, },
+})
+
+-- rice
+farming_super.register_plant("farming_super:rice", {
+	description = "Rice",
+	paramtype2 = "meshoptions",
+	place_param2 = "#",
+	inventory_image = "farming_super_seed_rice.png",
+-- 	visual_scale = 1.3,
+	steps = {8}, -- phases, steps per tier 
+	drops = {
+		p1s8t1 = {
+			max_items = 4,
+			items = {
+				{ items = {'farming_super:seed_rice 2'} },
+				{ items = {'farming_super:seed_rice'}, rarity = 2},
+				{ items = {'farming_super:seed_rice'}, rarity = 5},
+				{ items = {'farming_super:rice 2'} },
+				{ items = {'farming_super:rice'}, rarity = 2 },
 			}
 		}, 
 	},

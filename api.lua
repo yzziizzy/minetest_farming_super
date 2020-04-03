@@ -229,12 +229,14 @@ farming_super.grow_plant = function(pos, elapsed)
 	if minetest.get_item_group(node.name, "seed") and def.fertility then
 		local soil_node = minetest.get_node_or_nil({x = pos.x, y = pos.y - 1, z = pos.z})
 		if not soil_node then
+			print("no soil")
 			tick_again(pos, def.step_len)
 			return
 		end
 		
 		-- omitted is a check for light, we assume seeds can germinate in the dark.
 		for _, v in pairs(def.fertility) do
+			print("fertility: " ..v)
 			if minetest.get_item_group(soil_node.name, v) ~= 0 then
 				
 				local soil_meta = minetest.get_meta({x=pos.x, y=pos.y-1, z=pos.z})
@@ -382,6 +384,7 @@ farming_super.register_plant = function(name, def)
 			groups = g,
 			paramtype = "light",
 			paramtype2 = "wallmounted",
+			walkable = false,
 			place_param2 = def.place_param2 or nil, -- this isn't actually used for placement
 			--walkable = false,
 			sunlight_propagates = true,
