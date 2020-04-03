@@ -52,6 +52,8 @@ local function tick_again(pos, mul)
 	minetest.get_node_timer(pos):start(math.random(base_speed * mul, base_speed * 2 * mul))
 end
 
+farming_super.tick_node = tick
+
 -- Seed placement
 farming_super.place_seed = function(itemstack, placer, pointed_thing, plantname)
 	local pt = pointed_thing

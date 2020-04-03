@@ -357,25 +357,66 @@ farming_super.register_plant("farming_super:onion_red", {
 })
 
 
+local function place_pineapple(itemstack, placer, pointedthing)
+	local above = pointedthing.above
+	local under = pointedthing.under
+	local soil = minetest.get_node_or_nil(under)
+	if not soil then
+		return itemstack
+	end
+	
+	if minetest.get_item_group(soil.name, "wet") < 1 then
+		return itemstack
+	end
+	if minetest.get_item_group(soil.name, "desert") < 1 then
+		return itemstack
+	end
+	
+	minetest.set_node(above, {name="farming_super:pineapple_1_1", param2=2 })
+	farming_super.tick_node(above, 1)
+	
+	itemstack:take_item(1)
+	return itemstack
+end
+
+minetest.register_craftitem("farming_super:pineapple_sucker", {
+	description = "Pineapple Sucker",
+	inventory_image = "farming_super_pineapple_sucker.png",
+	on_place = place_pineapple,
+})
+minetest.register_craftitem("farming_super:pineapple_top", {
+	description = "Pineapple Top",
+	inventory_image = "farming_super_pineapple_top.png",
+	on_place = place_pineapple,
+})
+minetest.register_craftitem("farming_super:pineapple", {
+	description = "Pineapple",
+	inventory_image = "farming_super_pineapple.png",
+	on_use = minetest.item_eat(6, "farming_super:pineapple_top"),
+})
+
+
 farming_super.register_plant("farming_super:pineapple", {
 	description = "Pineapple",
 	paramtype2 = "meshoptions",
-	place_param2 = "#",
+	place_param2 = "hex",
 	inventory_image = "farming_super_pineapple_top.png",
 	steps = {5}, -- phases, steps per tier 
 	default_drop = {},
 	no_seed = true, -- pineapples don't have seeds in practice
+	no_harvest = true, -- defined above for special behavior
 	drops = {
 		p1s5t1 = {
-			max_items = 1,
+			max_items = 2,
 			items = {
 				{ items = {'farming_super:pineapple'} },
+				{ items = {'farming_super:pineapple_sucker'}, rarity = 4 },
 			}
 		}, 
 	},
 	minlight = 13,
 	maxlight = 15,
-	fertility = {"grassland", "desert"},
+	fertility = {"desert"},
 	groups = {flammable = 4},
 })
 
