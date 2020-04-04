@@ -36,7 +36,6 @@ oats
 okra
 peanuts
 peppers
-pineapple
 potatoes
 radishes, daikon
 rhubarb
@@ -234,8 +233,27 @@ farming_super.register_plant("farming_super:corn_lg", {
 })
 
 
-
-
+--[[
+minetest.register_decoration({
+	name = "farming_super:corn_sm",
+	deco_type = "simple",
+	place_on = {"default:dry_dirt_with_dry_grass", "default:dry_dirt"},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.0003,
+		scale = 0.0009,
+		spread = {x = 200, y = 200, z = 200},
+		seed = 9752,
+		octaves = 3,
+		persist = 0.6
+	},
+	biomes = {"savanna",},
+	y_max = 128,
+	y_min = 5,
+	decoration = "farming_super:corn_sm",
+	param2 = 3,
+})
+]]
 
 -- standard soybeans
 farming_super.register_plant("farming_super:soybeans", {
@@ -357,6 +375,33 @@ farming_super.register_plant("farming_super:onion_red", {
 })
 
 
+minetest.register_decoration({
+	name = "farming_super:onion_5_1",
+	deco_type = "simple",
+	place_on = {"default:dry_dirt_with_dry_grass", "default:dry_dirt"},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.0002,
+		scale = 0.0009,
+		spread = {x = 200, y = 200, z = 200},
+		seed = 2548,
+		octaves = 3,
+		persist = 0.6
+	},
+	biomes = {"savanna",},
+	y_max = 128,
+	y_min = 5,
+	decoration = {
+		"farming_super:onion_red_4_1",
+		"farming_super:onion_white_4_1",
+		"farming_super:onion_yellow_4_1",
+	},
+	param2 = 3,
+})
+
+
+
+
 local function place_pineapple(itemstack, placer, pointedthing)
 	local above = pointedthing.above
 	local under = pointedthing.under
@@ -420,6 +465,25 @@ farming_super.register_plant("farming_super:pineapple", {
 	groups = {flammable = 4},
 })
 
+minetest.register_decoration({
+	name = "farming_super:pineapple_5_1",
+	deco_type = "simple",
+	place_on = {"default:desert_sand", "default:sand"},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.0003,
+		scale = 0.0009,
+		spread = {x = 200, y = 200, z = 200},
+		seed = 3456,
+		octaves = 3,
+		persist = 0.6
+	},
+	biomes = {"desert", "sandstone_desert", "desert_ocean"},
+	y_max = 6,
+	y_min = 0,
+	decoration = "farming_super:pineapple_5_1",
+	param2 = 2,
+})
 
 
 
@@ -449,6 +513,28 @@ farming_super.register_plant("farming_super:soybeans", {
 	fertility = {"grassland"},
 	groups = {flammable = 4, fix_nitrogen = 1},
 })
+
+
+minetest.register_decoration({
+	name = "farming_super:soybeans_5_1",
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass",},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.0003,
+		scale = 0.0009,
+		spread = {x = 200, y = 200, z = 200},
+		seed = 9764,
+		octaves = 3,
+		persist = 0.6
+	},
+	biomes = {"grassland",},
+	y_max = 128,
+	y_min = 5,
+	decoration = "farming_super:soybeans_5_1",
+	param2 = 0,
+})
+
 
 
 -- standard cabbage
@@ -483,6 +569,84 @@ farming_super.register_plant("farming_super:cabbage", {
 	groups = {flammable = 4, },
 })
 
+
+minetest.register_decoration({
+	name = "farming_super:cabbage_4_1",
+	deco_type = "simple",
+	place_on = {"default:dirt_with_rainforest_litter",},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.0003,
+		scale = 0.0009,
+		spread = {x = 200, y = 200, z = 200},
+		seed = 5278,
+		octaves = 3,
+		persist = 0.6
+	},
+	biomes = {"jungle",},
+	y_max = 30,
+	y_min = 1,
+	decoration = "farming_super:cabbage_4_1",
+	param2 = 0,
+})
+
+
+
+-- standard cauliflower
+farming_super.register_plant("farming_super:cauliflower", {
+	description = "Cauliflower",
+	paramtype2 = "meshoptions",
+	place_param2 = "X",
+	inventory_image = "farming_super_seed_cauliflower.png",
+-- 	visual_scale = 1.3,
+	steps = {4}, -- phases, steps per tier 
+	textures = { -- overrides default texture naming, allowing reuse
+		p1s1t1 = "farming_super_green_pixels_1.png", 
+		p1s2t1 = "farming_super_green_pixels_2.png", 
+		p1s3t1 = "farming_super_cabbage_3.png", 
+		p1s4t1 = "farming_super_cauliflower_4.png", 
+	},
+	default_drop = {},
+	drops = {
+		p1s5t1 = {
+			max_items = 4,
+			items = {
+				{ items = {'farming_super:seed_cauliflower'} },
+				{ items = {'farming_super:seed_cauliflower'}, rarity = 2},
+				{ items = {'farming_super:seed_cauliflower'}, rarity = 5},
+				{ items = {'farming_super:cauliflower'} },
+			}
+		}, 
+	},
+	minlight = 10,
+	maxlight = 15,
+	fertility = {"grassland"},
+	groups = {flammable = 4, },
+})
+
+
+minetest.register_decoration({
+	name = "farming_super:cauliflower_4_1",
+	deco_type = "simple",
+	place_on = {"default:dirt_with_rainforest_litter",},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.0003,
+		scale = 0.0009,
+		spread = {x = 200, y = 200, z = 200},
+		seed = 8743,
+		octaves = 3,
+		persist = 0.6
+	},
+	biomes = {"jungle",},
+	y_max = 30,
+	y_min = 1,
+	decoration = "farming_super:cauliflower_4_1",
+	param2 = 0,
+})
+
+
+
 -- rice
 farming_super.register_plant("farming_super:rice", {
 	description = "Rice",
@@ -509,5 +673,25 @@ farming_super.register_plant("farming_super:rice", {
 	groups = {flammable = 4, },
 })
 
+
+minetest.register_decoration({
+	name = "farming_super:rice_8_1",
+	deco_type = "simple",
+	place_on = {"default:dirt_with_rainforest_litter",},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.0003,
+		scale = 0.0009,
+		spread = {x = 200, y = 200, z = 200},
+		seed = 1365,
+		octaves = 3,
+		persist = 0.6
+	},
+	biomes = {"jungle",},
+	y_max = 30,
+	y_min = 1,
+	decoration = "farming_super:rice_8_1",
+	param2 = 0,
+})
 
 

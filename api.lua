@@ -41,7 +41,7 @@ end
 
 
 
-local base_speed = 1
+local base_speed = 100
 
 -- how often node timers for plants will tick, +/- some random value
 local function tick(pos, mul)
@@ -477,6 +477,12 @@ farming_super.register_plant = function(name, def)
 					gg = g
 				end
 				
+				local height = -0.4
+				if tierCount > 1 and tier < tierCount then
+					height = 0.5
+				end
+				
+				--print(name.."-> ".. tier .. " / "..tierCount .. " " ..height)
 				minetest.register_node(name, {
 					drawtype = "plantlike",
 					waving = false,
@@ -489,7 +495,7 @@ farming_super.register_plant = function(name, def)
 					drop = drops,
 					selection_box = {
 						type = "fixed",
-						fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 0.5, 6 / 16},
+						fixed = {-5 / 16, -0.5, -5 / 16, 5 / 16, height, 5 / 16},
 					},
 					groups = gg,
 					sounds = default.node_sound_leaves_defaults(),
