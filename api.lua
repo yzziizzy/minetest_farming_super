@@ -429,11 +429,17 @@ farming_super.register_plant = function(name, def)
 
 	if not def.no_harvest then
 		-- Register harvest
-		minetest.register_craftitem(":" .. mname .. ":" .. pname, {
+		local h_def = {
 			description = pname:gsub("^%l", string.upper),
 			inventory_image = mname .. "_" .. pname .. ".png",
 			groups = {flammable = 2},
-		})
+		}
+		
+		if def.eat_value ~= nil then
+			h_def.on_use = minetest.item_eat(def.eat_value)
+		end
+		
+		minetest.register_craftitem(":" .. mname .. ":" .. pname, h_def)
 	end
 
 	local next_node = {
