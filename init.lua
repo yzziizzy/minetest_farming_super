@@ -37,7 +37,6 @@ okra
 peanuts
 peppers
 potatoes
-radishes, daikon
 rhubarb
 rice
 sorghum
@@ -698,6 +697,62 @@ minetest.register_decoration({
 	y_min = 1,
 	decoration = "farming_super:radish_4_1",
 	param2 = 3,
+})
+
+
+-- standard daikon
+farming_super.register_plant("farming_super:daikon", {
+	description = "Daikon",
+	paramtype2 = "meshoptions",
+	place_param2 = "V",
+	inventory_image = "farming_super_seed_daikon.png",
+-- 	visual_scale = 1.3,
+	eat_value = 4,
+	steps = {4}, -- phases, steps per tier 
+	step_len = {1, 2, 2, 2},
+	textures = { -- overrides default texture naming, allowing reuse
+		p1s1t1 = "farming_super_green_pixels_1.png", 
+		p1s2t1 = "farming_super_green_pixels_2.png", 
+		p1s3t1 = "farming_super_daikon_3.png", 
+		p1s4t1 = "farming_super_daikon_4.png", 
+	},
+	default_drop = {},
+	drops = {
+		p1s4t1 = {
+			max_items = 4,
+			items = {
+				{ items = {'farming_super:seed_daikon'} },
+				{ items = {'farming_super:seed_daikon'}, rarity = 2},
+				{ items = {'farming_super:seed_daikon'}, rarity = 5},
+				{ items = {'farming_super:daikon 4'} },
+			}
+		}, 
+	},
+	minlight = 10,
+	maxlight = 15,
+	fertility = {"grassland"},
+	groups = {flammable = 4, },
+})
+
+
+minetest.register_decoration({
+	name = "farming_super:daikon_4_1",
+	deco_type = "simple",
+	place_on = {"default:dirt_with_jungle_litter",},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.0003,
+		scale = 0.0009,
+		spread = {x = 200, y = 200, z = 200},
+		seed = 7362,
+		octaves = 3,
+		persist = 0.6
+	},
+	biomes = {"jungle", },
+	y_max = 30,
+	y_min = 1,
+	decoration = "farming_super:daikon_4_1",
+	param2 = 4,
 })
 
 
