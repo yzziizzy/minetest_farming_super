@@ -19,7 +19,6 @@ broccoli
 brussels sprouts
 canola
 cassava
-cauliflower
 celery
 colored carrots
 eggplant
@@ -753,6 +752,231 @@ minetest.register_decoration({
 	y_min = 1,
 	decoration = "farming_super:daikon_4_1",
 	param2 = 4,
+})
+
+
+
+-- standard carrot
+farming_super.register_plant("farming_super:carrot", {
+	description = "Carrot",
+	paramtype2 = "meshoptions",
+	place_param2 = "#",
+	inventory_image = "farming_super_seed_carrot.png",
+-- 	visual_scale = 1.3,
+	eat_value = 4,
+	steps = {4}, -- phases, steps per tier 
+	step_len = {1, 2, 2, 2},
+	textures = { -- overrides default texture naming, allowing reuse
+		p1s1t1 = "farming_super_2x_green_pixels_1.png", 
+		p1s2t1 = "farming_super_2x_green_pixels_2.png", 
+		p1s3t1 = "farming_super_carrot_3.png", 
+		p1s4t1 = "farming_super_carrot_4.png", 
+	},
+	default_drop = {},
+	drops = {
+		p1s4t1 = {
+			max_items = 4,
+			items = {
+				{ items = {'farming_super:seed_carrot'} },
+				{ items = {'farming_super:seed_carrot'}, rarity = 2},
+				{ items = {'farming_super:seed_carrot'}, rarity = 5},
+				{ items = {'farming_super:carrot 4'} },
+			}
+		}, 
+	},
+	minlight = 10,
+	maxlight = 15,
+	fertility = {"grassland"},
+	groups = {flammable = 4, },
+})
+
+
+minetest.register_decoration({
+	name = "farming_super:carrot_4_1",
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass",},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.0003,
+		scale = 0.0009,
+		spread = {x = 200, y = 200, z = 200},
+		seed = 2679,
+		octaves = 3,
+		persist = 0.6
+	},
+	biomes = {"grassland", },
+	y_max = 70,
+	y_min = 1,
+	decoration = "farming_super:carrot_4_1",
+	param2 = 3,
+})
+
+
+-- standard carrot_red
+farming_super.register_plant("farming_super:carrot_red", {
+	description = "Carrot, Red",
+	paramtype2 = "meshoptions",
+	place_param2 = "#",
+	inventory_image = "farming_super_seed_carrot.png",
+-- 	visual_scale = 1.3,
+	eat_value = 4,
+	steps = {4}, -- phases, steps per tier 
+	step_len = {1, 2, 2, 2},
+	textures = { -- overrides default texture naming, allowing reuse
+		p1s1t1 = "farming_super_2x_green_pixels_1.png", 
+		p1s2t1 = "farming_super_2x_green_pixels_2.png", 
+		p1s3t1 = "farming_super_carrot_3.png", 
+		p1s4t1 = "farming_super_carrot_red_4.png", 
+	},
+	default_drop = {},
+	drops = {
+		p1s4t1 = {
+			max_items = 4,
+			items = {
+				{ items = {'farming_super:seed_carrot_red'} },
+				{ items = {'farming_super:seed_carrot_red'}, rarity = 2},
+				{ items = {'farming_super:seed_carrot_red'}, rarity = 5},
+				{ items = {'farming_super:carrot_red 4'} },
+			}
+		}, 
+	},
+	minlight = 10,
+	maxlight = 15,
+	fertility = {"grassland"},
+	groups = {flammable = 4, },
+})
+
+
+minetest.register_decoration({
+	name = "farming_super:carrot_red_4_1",
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass",},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.0003,
+		scale = 0.0009,
+		spread = {x = 200, y = 200, z = 200},
+		seed = 8432,
+		octaves = 3,
+		persist = 0.6
+	},
+	biomes = {"grassland", },
+	y_max = 70,
+	y_min = 1,
+	decoration = "farming_super:carrot_red_4_1",
+	param2 = 3,
+})
+
+
+-- standard carrot_yellow
+farming_super.register_plant("farming_super:carrot_yellow", {
+	description = "Carrot, Yellow",
+	paramtype2 = "meshoptions",
+	place_param2 = "#",
+	inventory_image = "farming_super_seed_carrot.png",
+-- 	visual_scale = 1.3,
+	eat_value = 4,
+	steps = {4}, -- phases, steps per tier 
+	step_len = {1, 2, 2, 2},
+	textures = { -- overrides default texture naming, allowing reuse
+		p1s1t1 = "farming_super_2x_green_pixels_1.png", 
+		p1s2t1 = "farming_super_2x_green_pixels_2.png", 
+		p1s3t1 = "farming_super_carrot_3.png", 
+		p1s4t1 = "farming_super_carrot_yellow_4.png", 
+	},
+	default_drop = {},
+	drops = {
+		p1s4t1 = {
+			max_items = 4,
+			items = {
+				{ items = {'farming_super:seed_carrot_yellow'} },
+				{ items = {'farming_super:seed_carrot_yellow'}, rarity = 2},
+				{ items = {'farming_super:seed_carrot_yellow'}, rarity = 5},
+				{ items = {'farming_super:carrot_yellow 4'} },
+			}
+		}, 
+	},
+	minlight = 10,
+	maxlight = 15,
+	fertility = {"grassland"},
+	groups = {flammable = 4, },
+})
+
+
+minetest.register_decoration({
+	name = "farming_super:carrot_yellow_4_1",
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass",},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.0003,
+		scale = 0.0009,
+		spread = {x = 200, y = 200, z = 200},
+		seed = 1437,
+		octaves = 3,
+		persist = 0.6
+	},
+	biomes = {"grassland", },
+	y_max = 70,
+	y_min = 1,
+	decoration = "farming_super:carrot_yellow_4_1",
+	param2 = 3,
+})
+
+
+-- standard carrot_purple
+farming_super.register_plant("farming_super:carrot_purple", {
+	description = "Carrot, Purple",
+	paramtype2 = "meshoptions",
+	place_param2 = "#",
+	inventory_image = "farming_super_seed_carrot.png",
+-- 	visual_scale = 1.3,
+	eat_value = 4,
+	steps = {4}, -- phases, steps per tier 
+	step_len = {1, 2, 2, 2},
+	textures = { -- overrides default texture naming, allowing reuse
+		p1s1t1 = "farming_super_2x_green_pixels_1.png", 
+		p1s2t1 = "farming_super_2x_green_pixels_2.png", 
+		p1s3t1 = "farming_super_carrot_3.png", 
+		p1s4t1 = "farming_super_carrot_purple_4.png", 
+	},
+	default_drop = {},
+	drops = {
+		p1s4t1 = {
+			max_items = 4,
+			items = {
+				{ items = {'farming_super:seed_carrot_purple'} },
+				{ items = {'farming_super:seed_carrot_purple'}, rarity = 2},
+				{ items = {'farming_super:seed_carrot_purple'}, rarity = 5},
+				{ items = {'farming_super:carrot_purple 4'} },
+			}
+		}, 
+	},
+	minlight = 10,
+	maxlight = 15,
+	fertility = {"grassland"},
+	groups = {flammable = 4, },
+})
+
+
+minetest.register_decoration({
+	name = "farming_super:carrot_purple_4_1",
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass",},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.0003,
+		scale = 0.0009,
+		spread = {x = 200, y = 200, z = 200},
+		seed = 9978,
+		octaves = 3,
+		persist = 0.6
+	},
+	biomes = {"grassland", },
+	y_max = 70,
+	y_min = 1,
+	decoration = "farming_super:carrot_purple_4_1",
+	param2 = 3,
 })
 
 
