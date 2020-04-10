@@ -3,6 +3,7 @@ farming_super = {}
 
 local modpath = minetest.get_modpath("farming_super")
 
+-- dofile(modpath.."/nodes.lua")
 dofile(modpath.."/api.lua")
 
 
@@ -14,13 +15,12 @@ artichoke
 asparagus
 barley
 beans
-beets
+black pepper
 broccoli
 brussels sprouts
 canola
 cassava
 celery
-colored carrots
 eggplant
 garlic
 ginger
@@ -65,17 +65,18 @@ corn oil processing
 sugar processing
 
 
-
 TODO: core
-adjustable grow rates per step
 pests
 stick or strings for plants to grow on
 wilting on low water
 dead version of all plants
+yellowing on bad soil
 
 
 drop-in replacement for farming_plus
 
+BUGS:
+seed will move to first stage without wet soil
 
 ]]
 
@@ -756,6 +757,61 @@ minetest.register_decoration({
 
 
 
+-- standard beet
+farming_super.register_plant("farming_super:beet", {
+	description = "Beet",
+	paramtype2 = "meshoptions",
+	place_param2 = "#",
+	inventory_image = "farming_super_seed_beet.png",
+-- 	visual_scale = 1.3,
+	eat_value = 2,
+	steps = {4}, -- phases, steps per tier 
+	step_len = {1, 2, 2, 2},
+	textures = { -- overrides default texture naming, allowing reuse
+		p1s1t1 = "farming_super_2x_green_pixels_1.png", 
+		p1s2t1 = "farming_super_2x_green_pixels_2.png", 
+		p1s3t1 = "farming_super_beet_3.png", 
+		p1s4t1 = "farming_super_beet_4.png", 
+	},
+	default_drop = {},
+	drops = {
+		p1s4t1 = {
+			max_items = 3,
+			items = {
+				{ items = {'farming_super:seed_beet'} },
+				{ items = {'farming_super:seed_beet'}, rarity = 2},
+				{ items = {'farming_super:seed_beet'}, rarity = 5},
+				{ items = {'farming_super:beet 4'} },
+			}
+		}, 
+	},
+	minlight = 10,
+	maxlight = 15,
+	fertility = {"grassland"},
+	groups = {flammable = 4, },
+})
+
+
+minetest.register_decoration({
+	name = "farming_super:beet_4_1",
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass",},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.0003,
+		scale = 0.0009,
+		spread = {x = 200, y = 200, z = 200},
+		seed = 8421,
+		octaves = 3,
+		persist = 0.6
+	},
+	biomes = {"grassland", },
+	y_max = 70,
+	y_min = 1,
+	decoration = "farming_super:beet_4_1",
+	param2 = 3,
+})
+
 -- standard carrot
 farming_super.register_plant("farming_super:carrot", {
 	description = "Carrot",
@@ -763,7 +819,7 @@ farming_super.register_plant("farming_super:carrot", {
 	place_param2 = "#",
 	inventory_image = "farming_super_seed_carrot.png",
 -- 	visual_scale = 1.3,
-	eat_value = 4,
+	eat_value = 2,
 	steps = {4}, -- phases, steps per tier 
 	step_len = {1, 2, 2, 2},
 	textures = { -- overrides default texture naming, allowing reuse
@@ -775,7 +831,7 @@ farming_super.register_plant("farming_super:carrot", {
 	default_drop = {},
 	drops = {
 		p1s4t1 = {
-			max_items = 4,
+			max_items = 3,
 			items = {
 				{ items = {'farming_super:seed_carrot'} },
 				{ items = {'farming_super:seed_carrot'}, rarity = 2},
@@ -819,7 +875,7 @@ farming_super.register_plant("farming_super:carrot_red", {
 	place_param2 = "#",
 	inventory_image = "farming_super_seed_carrot.png",
 -- 	visual_scale = 1.3,
-	eat_value = 4,
+	eat_value = 2,
 	steps = {4}, -- phases, steps per tier 
 	step_len = {1, 2, 2, 2},
 	textures = { -- overrides default texture naming, allowing reuse
@@ -831,7 +887,7 @@ farming_super.register_plant("farming_super:carrot_red", {
 	default_drop = {},
 	drops = {
 		p1s4t1 = {
-			max_items = 4,
+			max_items = 3,
 			items = {
 				{ items = {'farming_super:seed_carrot_red'} },
 				{ items = {'farming_super:seed_carrot_red'}, rarity = 2},
@@ -875,7 +931,7 @@ farming_super.register_plant("farming_super:carrot_yellow", {
 	place_param2 = "#",
 	inventory_image = "farming_super_seed_carrot.png",
 -- 	visual_scale = 1.3,
-	eat_value = 4,
+	eat_value = 2,
 	steps = {4}, -- phases, steps per tier 
 	step_len = {1, 2, 2, 2},
 	textures = { -- overrides default texture naming, allowing reuse
@@ -887,7 +943,7 @@ farming_super.register_plant("farming_super:carrot_yellow", {
 	default_drop = {},
 	drops = {
 		p1s4t1 = {
-			max_items = 4,
+			max_items = 3,
 			items = {
 				{ items = {'farming_super:seed_carrot_yellow'} },
 				{ items = {'farming_super:seed_carrot_yellow'}, rarity = 2},
@@ -931,7 +987,7 @@ farming_super.register_plant("farming_super:carrot_purple", {
 	place_param2 = "#",
 	inventory_image = "farming_super_seed_carrot.png",
 -- 	visual_scale = 1.3,
-	eat_value = 4,
+	eat_value = 2,
 	steps = {4}, -- phases, steps per tier 
 	step_len = {1, 2, 2, 2},
 	textures = { -- overrides default texture naming, allowing reuse
@@ -943,7 +999,7 @@ farming_super.register_plant("farming_super:carrot_purple", {
 	default_drop = {},
 	drops = {
 		p1s4t1 = {
-			max_items = 4,
+			max_items = 3,
 			items = {
 				{ items = {'farming_super:seed_carrot_purple'} },
 				{ items = {'farming_super:seed_carrot_purple'}, rarity = 2},
