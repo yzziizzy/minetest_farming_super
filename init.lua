@@ -3,8 +3,9 @@ farming_super = {}
 
 local modpath = minetest.get_modpath("farming_super")
 
--- dofile(modpath.."/nodes.lua")
+dofile(modpath.."/nodes.lua")
 dofile(modpath.."/api.lua")
+dofile(modpath.."/vines.lua")
 
 
 
