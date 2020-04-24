@@ -6,7 +6,7 @@ local modpath = minetest.get_modpath("farming_super")
 dofile(modpath.."/nodes.lua")
 dofile(modpath.."/api.lua")
 dofile(modpath.."/vines.lua")
---dofile(modpath.."/hops.lua")
+dofile(modpath.."/hops.lua")
 
 
 
