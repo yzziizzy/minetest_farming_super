@@ -41,15 +41,19 @@ end
 
 
 
-local base_speed = 100
+local base_speed = 350
 
 -- how often node timers for plants will tick, +/- some random value
 local function tick(pos, mul)
-	minetest.get_node_timer(pos):start(math.random(base_speed * 2 * mul, base_speed * 3 * mul))
+	local timer = minetest.get_node_timer(pos)
+	timer:stop()
+	timer:start(math.random(base_speed * mul, base_speed * mul))
 end
 -- how often a growth failure tick is retried (e.g. too dark)
 local function tick_again(pos, mul)
-	minetest.get_node_timer(pos):start(math.random(base_speed * mul, base_speed * 2 * mul))
+	local timer = minetest.get_node_timer(pos)
+	timer:stop()
+	timer:start(math.random(base_speed * mul, base_speed * mul))
 end
 
 farming_super.tick_node = tick
@@ -221,65 +225,15 @@ farming_super.grow_plant = function(pos, elapsed)
 	local name = node.name
 	local def = minetest.registered_nodes[name]
 	local bp = def.base_plant
-	print("base_plant ".. bp)
-	print("next_growth_step ".. (def.next_growth_step or "end"))
-
-
+	local fdef = farming_super.registered_plants[bp]
+-- 	print("base_plant ".. bp)
+-- 	print("next_growth_step ".. (def.next_growth_step or "end"))
 	
-	
-	-- grow seed
-	if minetest.get_item_group(node.name, "seed") and def.fertility then
-		local soil_node = minetest.get_node_or_nil({x = pos.x, y = pos.y - 1, z = pos.z})
-		if not soil_node then
-			print("no soil")
-			tick_again(pos, def.step_len)
-			return
-		end
-		
-		-- omitted is a check for light, we assume seeds can germinate in the dark.
-		for _, v in pairs(def.fertility) do
-			print("fertility: " ..v)
-			if minetest.get_item_group(soil_node.name, v) ~= 0 then
-				
-				local soil_meta = minetest.get_meta({x=pos.x, y=pos.y-1, z=pos.z})
-				local nlevel = soil_meta:get_int("nitrogen")
-				if nlevel == 0 then
-					nlevel = 9
-					soil_meta:set_int("nitrogen", nlevel)
-				end
-				print("nlevel: " ..nlevel)
-				local var_name = get_seed_variant(def, nlevel) .. "_1_1"
-				local var_def = minetest.registered_items[var_name]
-				
-				if var_name == "death" or var_def == nil then
-					minetest.set_node(pos, {name="air"})
-					return
-				end
-				
-				install_plant(var_def, pos, 1)
-				
-				if var_def.groups.use_nitrogen then
-					soil_meta:set_int("nitrogen", math.max(1, nlevel - var_def.groups.use_nitrogen))
-					print("new nlevel: " ..nlevel - (var_def.groups.use_nitrogen or 0))
-				end
-				
-				--[[local placenode = {name = def.base_plant .. "_1_1"}
-				if def.place_param2 then
-					placenode.param2 = def.place_param2
-				end
-				]] -- minetest.swap_node(pos, placenode)
-			--	if minetest.registered_nodes[def.base_plant .. "_1_1"].next_plant then
-				tick(pos, def.step_len)
-				return
-			--		return
-			--	end
-			end
-		end
-
-		return
-	end
-
-	
+	local next_step = def.next_growth_step or (fdef.last_step + 1)
+-- 	print(dump(def))
+-- 	print(dump(fdef))
+-- 	print(dump(next_step))
+	local step_len = fdef.step_len[next_step] or 1
 	
 	
 	-- check if on wet soil
@@ -294,18 +248,88 @@ farming_super.grow_plant = function(pos, elapsed)
 	-- check light
 	local light = minetest.get_node_light(pos)
 	if not light or light < def.minlight or light > def.maxlight then
-		tick_again(pos, def.step_len)
+		tick_again(pos, step_len)
 		print("too dim ".. light.. ":"..def.minlight..":"..def.maxlight)
 		return
 	end
+	
+-- 	print(dump(step_len))
+-- 	print("elapsed "..elapsed)
+	-- calculate how many steps should have elapsed
+	while elapsed > step_len * base_speed do
+		elapsed = elapsed - step_len * base_speed
+		
+		next_step = next_step + 1
+		step_len = fdef.step_len[next_step]
+		if not step_len then
+			step_len = 1
+			break
+		end
+		
+		if next_step >= fdef.last_step then
+			break
+		end
+	end
+	
+	-- grow seed
+	if minetest.get_item_group(node.name, "seed") and def.fertility then
+		local soil_node = minetest.get_node_or_nil({x = pos.x, y = pos.y - 1, z = pos.z})
+		if not soil_node then
+-- 			print("no soil")
+			tick_again(pos, step_len)
+			return
+		end
+		
+		-- omitted is a check for light, we assume seeds can germinate in the dark.
+		for _, v in pairs(def.fertility) do
+-- 			print("fertility: " ..v)
+			if minetest.get_item_group(soil_node.name, v) ~= 0 then
+				
+				local soil_meta = minetest.get_meta({x=pos.x, y=pos.y-1, z=pos.z})
+				local nlevel = soil_meta:get_int("nitrogen")
+				if nlevel == 0 then
+					nlevel = 9
+					soil_meta:set_int("nitrogen", nlevel)
+				end
+-- 				print("nlevel: " ..nlevel)
+				local var_name = get_seed_variant(def, nlevel) .. "_1_1"
+				local var_def = minetest.registered_items[var_name]
+				
+				if var_name == "death" or var_def == nil then
+					minetest.set_node(pos, {name="air"})
+					return
+				end
+				
+				install_plant(var_def, pos, math.min(next_step, fdef.last_step))
+				
+				if var_def.groups.use_nitrogen then
+					soil_meta:set_int("nitrogen", math.max(1, nlevel - var_def.groups.use_nitrogen))
+-- 					print("new nlevel: " ..nlevel - (var_def.groups.use_nitrogen or 0))
+				end
+				
+				--[[local placenode = {name = def.base_plant .. "_1_1"}
+				if def.place_param2 then
+					placenode.param2 = def.place_param2
+				end
+				]] -- minetest.swap_node(pos, placenode)
+			--	if minetest.registered_nodes[def.base_plant .. "_1_1"].next_plant then
+				tick(pos, step_len)
+				return
+			--		return
+			--	end
+			end
+		end
 
+		return
+	end
+	
 	
 	-- grow
-	install_plant(def, pos, def.next_growth_step)
-
+	install_plant(def, pos, math.min(next_step, fdef.last_step))
+	
 	-- new timer needed?
-	if def.next_growth_step then
-		tick(pos, def.step_len)
+	if next_step < fdef.last_step then
+		tick(pos, step_len)
 	else -- end of growth, give nutrients
 		local soil_meta = minetest.get_meta({x = pos.x, y = pos.y - 1, z = pos.z})
 		if def.groups.fix_nitrogen then
@@ -362,7 +386,9 @@ farming_super.register_plant = function(name, def)
 	end
 	
 	local base_plant = mname .. ":" .. pname
-	
+	def.step_len = def.step_len or {}
+	def.step_len[1] = def.step_len[1] or 1
+
 
 	-- Register seed -- attached node needs not be on 2nd tier nodes
 	local g = {seed = 1, snappy = 3, attached_node = 1, flammable = 2}
@@ -403,7 +429,7 @@ farming_super.register_plant = function(name, def)
 			base_plant = base_plant,
 			next_growth_step = 1,
 			tier_count = 1,
-			step_len = (def.step_len and def.step_len[1]) or 1,
+			step_len = def.step_len[1],
 			groups = g,
 
 			on_place = function(itemstack, placer, pointed_thing)
@@ -454,12 +480,15 @@ farming_super.register_plant = function(name, def)
 	for _,numSteps in ipairs(def.steps) do
 		totalSteps = totalSteps + numSteps
 	end
+	
+	def.last_step = totalSteps
 -- 	print("total steps " .. totalSteps)
 	
 	local tex_base = mname.."_"..pname
 	if def.textures and def.textures.base then
 		tex_base = def.textures.base
 	end
+	
 	
 	local step = 1
 	for tierCount,numSteps in ipairs(def.steps) do
@@ -488,6 +517,20 @@ farming_super.register_plant = function(name, def)
 					height = 0.5
 				end
 				
+				def.step_len[step+1] = def.step_len[step+1] or 1
+				
+				local sbox = {
+					type = "fixed",
+					fixed = {-0.5, -0.5, -0.5, 0.5, -0.25, 0.5},
+				}
+				
+				if tierCount > 1 then
+					sbox =  {
+						type = "fixed",
+						fixed = {-5 / 16, -0.5, -5 / 16, 5 / 16, height, 5 / 16},
+					}
+				end
+				
 				--print(name.."-> ".. tier .. " / "..tierCount .. " " ..height)
 				minetest.register_node(name, {
 					drawtype = "plantlike",
@@ -499,16 +542,13 @@ farming_super.register_plant = function(name, def)
 					walkable = false,
 					buildable_to = true,
 					drop = drops,
-					selection_box = {
-						type = "fixed",
-						fixed = {-5 / 16, -0.5, -5 / 16, 5 / 16, height, 5 / 16},
-					},
+					selection_box = sbox,
 					groups = gg,
 					sounds = default.node_sound_leaves_defaults(),
 					next_growth_step = ns,
 					tier_count = tierCount,
 					base_plant = base_plant,
-					step_len = (def.step_len and def.step_len[step+1]) or 1,
+					step_len = def.step_len[step+1],
 					on_timer = farming_super.grow_plant,
 					minlight = def.minlight,
 					maxlight = def.maxlight,
@@ -542,7 +582,7 @@ farming_super.register_plant = function(name, def)
 	def.next_node = next_node
 	def.stack_height = stack_height
 -- 	print("def name "..pname)
-	farming_super.registered_plants[pname] = def
+	farming_super.registered_plants[base_plant] = def
 
 
 	--[[ 

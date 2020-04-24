@@ -23,7 +23,6 @@ minetest.register_craftitem("farming_super:kiwi", {
 minetest.register_craftitem("farming_super:kiwi_sapling", {
 	description = "Kiwi Sapling",
 	inventory_image = "farming_super_kiwi_vine.png",
-	on_use = minetest.item_eat(2),
 	groups = {flammable = 2},
 	
 	on_place = function(itemstack, placer, pointed_thing)

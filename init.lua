@@ -6,6 +6,7 @@ local modpath = minetest.get_modpath("farming_super")
 dofile(modpath.."/nodes.lua")
 dofile(modpath.."/api.lua")
 dofile(modpath.."/vines.lua")
+--dofile(modpath.."/hops.lua")
 
 
 
@@ -54,7 +55,7 @@ yams
 
 
 much later:
-	cucumber
+	cucumber -- gourds
 	grapes
 	hops
 	kiwi
@@ -494,6 +495,7 @@ farming_super.register_plant("farming_super:soybeans", {
 	place_param2 = "X",
 	inventory_image = "farming_super_seed_soybeans.png",
 -- 	visual_scale = 1.3,
+	step_len = {1, 2, 2, 2},
 	steps = {5}, -- phases, steps per tier 
 	default_drop = {},
 	drops = {
@@ -545,6 +547,7 @@ farming_super.register_plant("farming_super:cabbage", {
 	inventory_image = "farming_super_seed_cabbage.png",
 -- 	visual_scale = 1.3,
 	steps = {4}, -- phases, steps per tier 
+	step_len = {1, 1, 2, 2},
 	textures = { -- overrides default texture naming, allowing reuse
 		p1s1t1 = "farming_super_green_pixels_1.png", 
 		p1s2t1 = "farming_super_green_pixels_2.png", 
@@ -600,6 +603,7 @@ farming_super.register_plant("farming_super:cauliflower", {
 	inventory_image = "farming_super_seed_cauliflower.png",
 -- 	visual_scale = 1.3,
 	steps = {4}, -- phases, steps per tier 
+	step_len = {1, 1, 2, 2},
 	textures = { -- overrides default texture naming, allowing reuse
 		p1s1t1 = "farming_super_green_pixels_1.png", 
 		p1s2t1 = "farming_super_green_pixels_2.png", 
@@ -822,7 +826,7 @@ farming_super.register_plant("farming_super:carrot", {
 -- 	visual_scale = 1.3,
 	eat_value = 2,
 	steps = {4}, -- phases, steps per tier 
-	step_len = {1, 2, 2, 2},
+	step_len = {1, 2, 3, 3},
 	textures = { -- overrides default texture naming, allowing reuse
 		p1s1t1 = "farming_super_2x_green_pixels_1.png", 
 		p1s2t1 = "farming_super_2x_green_pixels_2.png", 
@@ -878,7 +882,7 @@ farming_super.register_plant("farming_super:carrot_red", {
 -- 	visual_scale = 1.3,
 	eat_value = 2,
 	steps = {4}, -- phases, steps per tier 
-	step_len = {1, 2, 2, 2},
+	step_len = {1, 2, 3, 3},
 	textures = { -- overrides default texture naming, allowing reuse
 		p1s1t1 = "farming_super_2x_green_pixels_1.png", 
 		p1s2t1 = "farming_super_2x_green_pixels_2.png", 
@@ -934,7 +938,7 @@ farming_super.register_plant("farming_super:carrot_yellow", {
 -- 	visual_scale = 1.3,
 	eat_value = 2,
 	steps = {4}, -- phases, steps per tier 
-	step_len = {1, 2, 2, 2},
+	step_len = {1, 2, 3, 3},
 	textures = { -- overrides default texture naming, allowing reuse
 		p1s1t1 = "farming_super_2x_green_pixels_1.png", 
 		p1s2t1 = "farming_super_2x_green_pixels_2.png", 
@@ -990,7 +994,7 @@ farming_super.register_plant("farming_super:carrot_purple", {
 -- 	visual_scale = 1.3,
 	eat_value = 2,
 	steps = {4}, -- phases, steps per tier 
-	step_len = {1, 2, 2, 2},
+	step_len = {1, 2, 3, 3},
 	textures = { -- overrides default texture naming, allowing reuse
 		p1s1t1 = "farming_super_2x_green_pixels_1.png", 
 		p1s2t1 = "farming_super_2x_green_pixels_2.png", 
@@ -1044,6 +1048,7 @@ farming_super.register_plant("farming_super:rice", {
 	paramtype2 = "meshoptions",
 	place_param2 = "#",
 	inventory_image = "farming_super_seed_rice.png",
+	default_drop = {},
 -- 	visual_scale = 1.3,
 	steps = {8}, -- phases, steps per tier 
 	drops = {
