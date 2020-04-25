@@ -1049,17 +1049,16 @@ farming_super.register_plant("farming_super:rice", {
 	place_param2 = "#",
 	inventory_image = "farming_super_seed_rice.png",
 	default_drop = {},
+	eat_value = 2,
 -- 	visual_scale = 1.3,
 	steps = {8}, -- phases, steps per tier 
 	drops = {
 		p1s8t1 = {
 			max_items = 4,
 			items = {
-				{ items = {'farming_super:seed_rice 2'} },
+				{ items = {'farming_super:seed_rice 3'} },
 				{ items = {'farming_super:seed_rice'}, rarity = 2},
 				{ items = {'farming_super:seed_rice'}, rarity = 5},
-				{ items = {'farming_super:rice 2'} },
-				{ items = {'farming_super:rice'}, rarity = 2 },
 			}
 		}, 
 	},
@@ -1067,6 +1066,12 @@ farming_super.register_plant("farming_super:rice", {
 	maxlight = 15,
 	fertility = {"grassland"},
 	groups = {flammable = 4, },
+})
+
+minetest.register_craft({
+	output = "farming_super:rice",
+	type = "cooking",
+	recipe = "farming_super:seed_rice",
 })
 
 
@@ -1089,5 +1094,12 @@ minetest.register_decoration({
 	decoration = "farming_super:rice_8_1",
 	param2 = 0,
 })
+
+
+
+
+dofile(modpath.."/crafts.lua")
+
+
 
 
