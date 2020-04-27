@@ -7,6 +7,7 @@ dofile(modpath.."/nodes.lua")
 dofile(modpath.."/api.lua")
 dofile(modpath.."/vines.lua")
 dofile(modpath.."/hops.lua")
+dofile(modpath.."/grapes.lua")
 
 
 
