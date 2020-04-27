@@ -5,40 +5,37 @@
 
 
 
+local grape_speed = {
+	rand = 60,
+	retry = 30,
+	cutting = 1200,
+	sapling = 2400,
+	fruit = 600,
+	leaf_regrowth = 40,
+}
+--[[
+
+local grape_speed = {
+	retry = 2,
+	cutting = 6,
+	sapling = 6,
+	fruit = 4,
+	leaf_regrowth = 4,
+}
+]]
 
 
-
-local grape_base_speed = 300
-local grape_retry_speed = 25
-
-
+local function gr() 
+	return math.random(grape_speed.rand)
+end
 
 
 minetest.register_craftitem("farming_super:grape_leaves", {
 	description = "Grape Leaves",
-	inventory_image = "farming_super_grape_leaves_item.png",
+	inventory_image = "farming_super_grapes_leaves_item.png",
 	on_use = minetest.item_eat(1),
 	groups = {flammable = 1},
 })
---[[
-minetest.register_craftitem("farming_super:grape_sapling", {
-	description = "Grape Sapling",
-	inventory_image = "farming_super_grape_sapling.png",
-	groups = {flammable = 2},
-	
-	on_place = function(itemstack, placer, pointed_thing)
-		local n = minetest.get_node(pointed_thing.under)
-		
-		if n.name == "farming:soil_wet" then
-			itemstack:take_item()
-			minetest.set_node(pointed_thing.under, {name = "farming_super:grape_vine", param2 = 1,})
-		end
-		
-		return itemstack
-	end,
-})]]
-
-
 
 
 
@@ -52,7 +49,7 @@ for gi,color in ipairs(colors) do
 	minetest.register_node("farming_super:grape_cutting_"..color, {
 		description = "Grape Cutting",
 		drawtype = "plantlike",
-		waving = 1,
+-- 		waving = 1,
 	-- 	visual_scale = 1.69,
 		tiles = {"farming_super_grapes_cutting.png"},
 		inventory_image = "farming_super_grapes_cutting.png",
@@ -62,11 +59,11 @@ for gi,color in ipairs(colors) do
 		walkable = false,
 		buildable_to = false,
 		grape_color = color,
-		groups = {snappy = 2, flora = 1, flammable = 1},
+		groups = {snappy = 2, oddly_breakable_by_hand = 2, flammable = 1, grape_cutting=1},
 		sounds = default.node_sound_leaves_defaults(),
 		selection_box = {
 			type = "fixed",
-			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 0.5, 6 / 16},
+			fixed = {-3 / 16, -0.5, -3 / 16, 3 / 16, 0.5, 3 / 16},
 		},
 		place_param2 = 1,
 		
@@ -74,7 +71,7 @@ for gi,color in ipairs(colors) do
 			
 			minetest.set_node(pointed_thing.above, {name="farming_super:grape_cutting_"..color, param2 = 1})
 			local timer = minetest.get_node_timer(pointed_thing.above)
-			timer:start(grape_base_speed)
+			timer:start(grape_speed.cutting + gr())
 			
 			itemstack:take_item(1)
 			return itemstack
@@ -90,14 +87,14 @@ for gi,color in ipairs(colors) do
 			if soil.name ~= "farming:desert_sand_soil_wet" then
 				pos.y = pos.y + 1
 -- 				print("wrong soil")
-				minetest.get_node_timer(pos):start(grape_retry_speed)
+				minetest.get_node_timer(pos):start(grape_speed.retry)
 				return
 			end
 			
 			pos.y = pos.y + 1
 			minetest.set_node(pos, {name = "farming_super:grape_sapling_"..color, param2 = 1})
 		
-			minetest.get_node_timer(pos):start(grape_base_speed)
+			minetest.get_node_timer(pos):start(grape_speed.sapling + gr())
 		end,
 	})
 
@@ -114,11 +111,11 @@ for gi,color in ipairs(colors) do
 		walkable = false,
 		buildable_to = false,
 		grape_color = color,
-		groups = {snappy = 2, flora = 1, flammable = 1},
+		groups = {snappy = 2, oddly_breakable_by_hand = 2, flammable = 1, grape_sapling=1},
 		sounds = default.node_sound_leaves_defaults(),
 		selection_box = {
 			type = "fixed",
-			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 0.5, 6 / 16},
+			fixed = {-5 / 16, -0.5, -5 / 16, 5 / 16, 0.5, 5 / 16},
 		},
 		place_param2 = 1,
 		
@@ -126,7 +123,7 @@ for gi,color in ipairs(colors) do
 			
 			minetest.set_node(pointed_thing.above, {name="farming_super:grape_sapling_"..color, param2 = 1})
 			local timer = minetest.get_node_timer(pointed_thing.above)
-			timer:start(grape_base_speed)
+			timer:start(grape_speed.sapling + gr())
 			
 			itemstack:take_item(1)
 			return itemstack
@@ -142,7 +139,7 @@ for gi,color in ipairs(colors) do
 			if soil.name ~= "farming:desert_sand_soil_wet" then
 				pos.y = pos.y + 1
 -- 				print("wrong soil")
-				minetest.get_node_timer(pos):start(grape_retry_speed)
+				minetest.get_node_timer(pos):start(grape_speed.retry)
 				return
 			end
 			
@@ -150,13 +147,14 @@ for gi,color in ipairs(colors) do
 			local wire = minetest.get_node(pos)
 			if wire.name ~= "farming_super:wire" then
 				pos.y = pos.y - 2
-				minetest.get_node_timer(pos):start(grape_retry_speed)
+				minetest.get_node_timer(pos):start(grape_speed.retry)
 -- 				print("no wire")
 				return
 			end
 			
 			pos.y = pos.y - 1
 			minetest.set_node(pos, {name = "farming_super:grape_leaves_"..color, param2 = 3})
+			minetest.get_node_timer(pos):start(grape_speed.fruit + gr())
 			pos.y = pos.y - 1
 			minetest.set_node(pos, {name = "farming_super:grape_stem_"..color, param2 = 1})
 		end,
@@ -183,11 +181,11 @@ for gi,color in ipairs(colors) do
 				{ items = {'farming_super:grape_cutting_'..color}, rarity = 2 },
 			}
 		},
-		groups = {snappy = 3, flora = 1, flammable = 1, grape_stem = 1, not_in_creative_inventory=1},
+		groups = {snappy = 1, choppy=2, flammable = 1, grape_stem = 1, not_in_creative_inventory=1},
 		sounds = default.node_sound_leaves_defaults(),
 		selection_box = {
 			type = "fixed",
-			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 0.5, 6 / 16},
+			fixed = {-3 / 16, -0.5, -3 / 16, 3 / 16, 0.5, 3 / 16},
 		},
 		place_param2 = 1,
 		
@@ -212,12 +210,12 @@ for gi,color in ipairs(colors) do
 		sunlight_propagates = true,
 -- 		walkable = false,
 		climbable = true,
-		groups = {snappy=3, flora=1, flammable=1, grape_leaves=1, grape_leaves_bare=1, not_in_creative_inventory=1},
+		groups = {snappy=1, flammable=1, grape_leaves=1, grape_leaves_bare=1, not_in_creative_inventory=1},
 		grape_color = color,
 		drop = {
 			max_items = 2,
 			items = {
-				{ items = {'farming_super:grape_leaves 2'} },
+				{ items = {'farming_super:grape_leaves 1'} },
 				{ items = {'farming_super:grape_leaves 1'}, rarity = 4 },
 				{ items = {'farming_super:grape_cutting_'..color}, rarity = 10 },
 			}
@@ -225,9 +223,21 @@ for gi,color in ipairs(colors) do
 		sounds = default.node_sound_leaves_defaults(),
 		selection_box = {
 			type = "fixed",
-			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 0.5, 6 / 16},
+			fixed = {-5 / 16, -0.5, -5 / 16, 5 / 16, 0.5, 5 / 16},
+		},
+		collision_box = {
+			type = "fixed",
+			fixed = {-5 / 16, -0.5, -5 / 16, 5 / 16, 0.5, 5 / 16},
 		},
 		place_param2 = 3,
+		
+		on_timer = function(pos, elapsed)
+			local node = minetest.get_node(pos)
+			local color = minetest.registered_nodes[node.name].grape_color
+			minetest.set_node(pos, {name = "farming_super:grape_leaves_ripe_"..color, param2 = 3})
+
+			minetest.get_node_timer(pos):start(grape_speed.fruit + gr())
+		end,
 	})
 
 	minetest.register_node("farming_super:grape_yellow_leaves_"..color, {
@@ -242,15 +252,15 @@ for gi,color in ipairs(colors) do
 -- 		walkable = false,
 		climbable = true,
 		grape_color = color,
-		groups = {snappy=3, flora=1, flammable=1, grape_leaves=1, not_in_creative_inventory=1},
+		groups = {snappy=1, flammable=1, grape_leaves=1, not_in_creative_inventory=1},
 		sounds = default.node_sound_leaves_defaults(),
 		selection_box = {
 			type = "fixed",
-			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 0.5, 6 / 16},
+			fixed = {-5 / 16, -0.5, -5 / 16, 5 / 16, 0.5, 5 / 16},
 		},
 		collision_box = {
 			type = "fixed",
-			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 0.5, 6 / 16},
+			fixed = {-5 / 16, -0.5, -5 / 16, 5 / 16, 0.5, 5 / 16},
 		},
 		place_param2 = 3,
 	})
@@ -266,7 +276,7 @@ for gi,color in ipairs(colors) do
 		sunlight_propagates = true,
 -- 		walkable = true,
 		climbable = true,
-		groups = {snappy=3, flora=1, flammable=1, grape_leaves=1, not_in_creative_inventory=1},
+		groups = {snappy=1, flammable=1, grape_leaves=1, not_in_creative_inventory=1},
 		sounds = default.node_sound_leaves_defaults(),
 		drop = {
 			max_items = 2,
@@ -278,17 +288,30 @@ for gi,color in ipairs(colors) do
 		},
 		selection_box = {
 			type = "fixed",
-			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 0.5, 6 / 16},
+			fixed = {-5 / 16, -0.5, -5 / 16, 5 / 16, 0.5, 5 / 16},
 		},
 		collision_box = {
 			type = "fixed",
-			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 0.5, 6 / 16},
+			fixed = {-5 / 16, -0.5, -5 / 16, 5 / 16, 0.5, 5 / 16},
 		},
 		place_param2 = 3,
 		
-		after_dig_node = function(pos, oldnode, oldmetadata, digger)
-			minetest.set_node(pos, {name = "farming_super:grape_leaves_"..color})
+-- 		after_dig_node = function(pos, oldnode, oldmetadata, digger)
+-- 			minetest.set_node(pos, {name = "farming_super:grape_leaves_"..color})
+-- 		end,
+		
+		on_punch = function(pos, node, puncher)
+			local inv = puncher:get_inventory()
+			
+			local drops = minetest.get_node_drops(node.name)
+			for _,d in pairs(drops) do
+				inv:add_item("main", d)
+			end
+			
+			minetest.set_node(pos, {name = "farming_super:grape_leaves_"..color, param2 = 3})
+			minetest.get_node_timer(pos):start(grape_speed.fruit + gr())
 		end,
+		
 	})
 	
 	
@@ -328,81 +351,11 @@ end
 
 
 
---[[
-minetest.register_abm({
-	label = "Grape wire",
-	neighbors = {"farming_super:grape_2"},
-	nodenames = {"farming_super:wire"},
-	interval = 1,
-	chance = 1,
-	action = function(pos, node)
-		
-		local airs = minetest.find_nodes_in_area(
-			{x=pos.x-1, y=pos.y-1, z=pos.z-1}, 
-			{x=pos.x+1, y=pos.y-1, z=pos.z+1}, 
-			{"air"})
-		
-		if #airs > 0 then
-			local p = airs[math.random(1,#airs)]
-			
-			minetest.set_node(p, {name="farming_super:grape_3", param2 = 2,})
-		end
-	end,
-})
-
-minetest.register_abm({
-	label = "Grape Vine Growth",
-	nodenames = {"farming_super:grape_vine"},
-	interval = 1,
-	chance = 1,
-	action = function(pos, node)
-		local lvl = minetest.get_node_level(pos)
-		
-		local cnt = math.max(1, math.ceil(((lvl - 7) / 16) ))
-		
-		local top = {x=pos.x, y=pos.y + cnt, z=pos.z}
-		local stick = minetest.get_node(top)
-		
-		if stick.name == "farming_super:pole" then
-			minetest.add_node_level(pos, 1)
-			
-		elseif stick.name == "farming_super:wire" then
-				
-			local airs = minetest.find_nodes_in_area(
-				{x=top.x-1, y=top.y-1, z=top.z-1}, 
-				{x=top.x+1, y=top.y-1, z=top.z+1}, 
-				{"air"})
-			
-			if #airs > 0 then
-				local p = airs[math.random(1,#airs)]
-				
-				minetest.set_node(p, {name="farming_super:grape_2", param2 = 2})
-			end
-		end
-		
--- 		local n = minetest.get_node(pos)
--- 		print(n.param2)
--- 		minetest.set_node(pos, {name = "farming_super:grape_1", param2 = node.param2 + 1})
-	end,
-})
-
-minetest.register_abm({
-	label = "Grape Vine Fruit",
-	nodenames = {"farming_super:grape_2"},
-	interval = 1,
-	chance = 5,
-	action = function(pos, node)
-		minetest.set_node(pos, {name = "farming_super:grape_2_fruit", param2 = 2})
-	end,
-})
-
-]]
-
 
 minetest.register_abm({
 	label = "Grape Vine Leaf Regrowth",
 	nodenames = {"group:grape_stem"},
-	interval = grape_base_speed / 10,
+	interval = grape_speed.leaf_regrowth,
 	chance = 20,
 	action = function(pos, node)
 		pos.y = pos.y + 1
@@ -412,6 +365,7 @@ minetest.register_abm({
 			
 			local color = minetest.registered_nodes[node.name].grape_color
 			minetest.set_node(pos, {name = "farming_super:grape_leaves_"..color, param2 = 3})
+			minetest.get_node_timer(pos):start(grape_speed.fruit + gr())
 		end
 	end,
 })
@@ -420,10 +374,45 @@ minetest.register_abm({
 minetest.register_abm({
 	label = "Grape Vine Fruit",
 	nodenames = {"group:grape_leaves_bare"},
-	interval = grape_base_speed / 10,
-	chance = 30,
+	interval = 10,
+	chance = 10,
 	action = function(pos, node)
-		local color = minetest.registered_nodes[node.name].grape_color
-		minetest.set_node(pos, {name = "farming_super:grape_leaves_ripe_"..color, param2 = 3})
+		local timer = minetest.get_node_timer(pos)
+		if not timer:is_started() then
+			timer:start(grape_speed.fruit + gr())
+		end
+		
 	end,
 })
+
+minetest.register_abm({
+	label = "Grape Vine Fruit",
+	nodenames = {"group:grape_stem", "group:grape_cutting", "group:grape_sapling"},
+	interval = 30,
+	chance = 5,
+	action = function(pos, node)
+		local timer = minetest.get_node_timer(pos)
+		if not timer:is_started() then
+			timer:start(grape_speed.fruit + gr())
+		end
+		
+	end,
+})
+
+--[[
+minetest.register_abm({
+	label = "Grape Leave Disease",
+	nodenames = {"group:grape_leaves"},
+	interval = 60,
+	chance = 100,
+	action = function(pos, node)
+		local color = minetest.registered_nodes[node.name].grape_color
+		minetest.set_node(pos, {name = "farming_super:grape_yellow_leaves_"..color, param2 = 3})
+		minetest.get_node_timer(pos):start(grape_speed.fruit + gr())
+		
+		
+	end,
+})
+]]
+
+
