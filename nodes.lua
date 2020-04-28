@@ -90,3 +90,59 @@ minetest.register_craft({
 
 
 
+
+
+minetest.register_node("farming_super:barrel", {
+	description = "Wooden Barrel",
+	tiles = {
+		"default_wood.png^farming_super_barrel_bung.png", 
+		"default_wood.png", 
+		"default_wood.png^farming_super_barrel_rings.png",
+		"default_wood.png^farming_super_barrel_rings.png", 
+		"default_wood.png^farming_super_barrel_rings.png", 
+		"default_wood.png^farming_super_barrel_rings.png"
+	},
+	paramtype2 = "facedir",
+	-- inventory_image = "bitumen_oil_drum.png",
+	groups = {
+		cracky=2,
+		choppy=2,
+		oddly_breakable_by_hand=2,
+	},
+	paramtype = "light",
+	drawtype = "nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			--11.25
+			{-0.49, -0.5, -0.10, 0.49, 0.5, 0.10},
+			{-0.10, -0.5, -0.49, 0.10, 0.5, 0.49},
+			--22.5
+			{-0.46, -0.5, -0.19, 0.46, 0.5, 0.19},
+			{-0.19, -0.5, -0.46, 0.19, 0.5, 0.46},
+			-- 33.75
+			{-0.416, -0.5, -0.28, 0.416, 0.5, 0.28},
+			{-0.28, -0.5, -0.416, 0.28, 0.5, 0.416},
+			--45
+			{-0.35, -0.5, -0.35, 0.35, 0.5, 0.35},
+		},
+	},
+	selection_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+		},
+	},
+})
+
+
+minetest.register_craft({
+	output = "farming_super:barrel 1",
+	recipe = {
+		{"default:wood","default:wood","default:wood"},
+		{"default:steel_ingot","default:steel_ingot","default:steel_ingot"},
+		{"default:wood","default:wood","default:wood"},
+	}
+})
+
+
