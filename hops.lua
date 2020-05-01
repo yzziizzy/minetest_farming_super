@@ -41,7 +41,6 @@ minetest.register_node("farming_super:hops_vine", {
 	description = "Hops Plant",
 	drawtype = "plantlike_rooted",
 	waving = 1,
-	tiles = {"default_sand.png"},
 	tiles = {"default_dirt.png^farming_soil_wet.png", "default_dirt.png^farming_soil_wet_side.png"},
 	drop = "default:dirt",
 	special_tiles = {{name = "farming_super_hops_vine.png", tileable_vertical = true}},

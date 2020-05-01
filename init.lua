@@ -8,6 +8,7 @@ dofile(modpath.."/api.lua")
 dofile(modpath.."/vines.lua")
 dofile(modpath.."/hops.lua")
 dofile(modpath.."/grapes.lua")
+dofile(modpath.."/trees.lua")
 
 
 
@@ -69,17 +70,31 @@ sugar processing
 
 
 TODO: core
-pests
+pests, locusts like butterflies
 stick or strings for plants to grow on
 wilting on low water
 dead version of all plants
 yellowing on bad soil
 
+fruit trees
+	apple, proper
+	all citrus
+	pears
+	durian, jackfruit
+fruit flies
+rotten fruit on the ground
+tree hybrids
+smudge pots
+vinegar
+
+scythe for harvesting larger squares
+better solution for excessive hoe clicking
 
 drop-in replacement for farming_plus
 
 BUGS:
 seed will move to first stage without wet soil
+fix on_place to not re-place the same plant and waste inventory
 
 ]]
 
@@ -1101,6 +1116,30 @@ minetest.register_decoration({
 
 dofile(modpath.."/crafts.lua")
 
-
+minetest.register_node("farming_super:test", {
+	description = "Tester",
+	drawtype = "plantlike",
+-- 	waving = 1,
+-- 	visual_scale = 1.69,
+	tiles = {"farming_super_trellis.png"},
+	inventory_image = "farming_super_test.png",
+	paramtype = "light",
+	paramtype2 = "meshoptions",
+	sunlight_propagates = true,
+-- 	walkable = false,
+	buildable_to = false,
+	grape_color = color,
+	groups = {snappy = 2, plant=1, oddly_breakable_by_hand = 1, },
+	sounds = default.node_sound_leaves_defaults(),
+	selection_box = {
+		type = "fixed",
+		fixed = {-4 / 16, -0.5, -4 / 16, 4 / 16, 0.5, 4 / 16},
+	},
+	collision_box = {
+		type = "fixed",
+		fixed = {-4 / 16, -0.5, -4 / 16, 4 / 16, 0.5, 4 / 16},
+	},
+	place_param2 = 3,
+})
 
 

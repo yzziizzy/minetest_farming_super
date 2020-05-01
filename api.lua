@@ -689,3 +689,199 @@ farming_super.register_plant = function(name, def)
 	}
 	return r
 end
+
+
+
+
+
+-- plants with hardware above ground, like tomatoes
+farming_super.register_rooted_plant = function(name, def)
+	local mname = name:split(":")[1]
+	local pname = name:split(":")[2]
+	
+	local def_drops = def.drops or {}
+	
+	-- Check def table
+	if not def.description then
+		def.description = "Seed"
+	end
+	if not def.inventory_image then
+		def.inventory_image = "unknown_item.png"
+	end
+	if not def.steps then
+		return nil
+	end
+	if type(def.steps) == "number" then
+		def.steps = {def.steps}
+	end
+	if not def.minlight then
+		def.minlight = 1
+	end
+	if not def.maxlight then
+		def.maxlight = 14
+	end
+	if not def.fertility then
+		def.fertility = {}
+	end
+
+	if def.place_param2 == "plus" then
+		def.place_param2 = 1
+	elseif def.place_param2 == "hex" then
+		def.place_param2 = 2 
+	elseif def.place_param2 == "hatch" or def.place_param2 == "#" then
+		def.place_param2 = 3 -- the shape of #
+	elseif def.place_param2 == "V" or def.place_param2 == "v" then
+		def.place_param2 = 4 -- used by dry_shrub
+	elseif def.place_param2 == "X" or def.place_param2 == "x" then
+		def.place_param2 = 0 -- regular plants
+	end
+	
+	local base_plant = mname .. ":" .. pname
+	def.step_len = def.step_len or {}
+	def.step_len[1] = def.step_len[1] or 1
+
+
+	-- Register seed -- attached node needs not be on 2nd tier nodes
+	local g = {seed = 1, snappy = 3, attached_node = 1, flammable = 2}
+	local g2 = {seed = 1, snappy = 3, flammable = 2}
+	for k, v in pairs(def.fertility) do
+		g[v] = 1
+		g2[v] = 1
+	end
+	for k, v in pairs(def.groups) do
+		g[k] = v
+		g2[k] = v
+	end
+	
+	if not def.no_harvest then
+		-- Register harvest
+		local h_def = {
+			description = pname:gsub("^%l", string.upper),
+			inventory_image = mname .. "_" .. pname .. ".png",
+			groups = {flammable = 2},
+		}
+		
+		if def.eat_value ~= nil then
+			h_def.on_use = minetest.item_eat(def.eat_value)
+		end
+		
+		minetest.register_craftitem(":" .. mname .. ":" .. pname, h_def)
+	end
+
+	local next_node = {
+		[mname .. ":seed_" .. pname] = mname .. ":" .. pname .. "_1_1"
+	}
+	local stack_height = {
+		[mname .. ":seed_" .. pname] = 1
+	}
+	local last = nil
+	local totalSteps = 0
+	for _,numSteps in ipairs(def.steps) do
+		totalSteps = totalSteps + numSteps
+	end
+	
+	def.last_step = totalSteps
+-- 	print("total steps " .. totalSteps)
+	
+	local tex_base = mname.."_"..pname
+	if def.textures and def.textures.base then
+		tex_base = def.textures.base
+	end
+	
+	
+
+	local name = mname .. ":" .. pname .. "_"..step.."_"..tier
+	
+	local dropname = "p"..tierCount.."s"..tierStep.."t"..tier
+	local drops = def_drops[dropname] or def.default_drop
+	local tex = (def.textures and def.textures[dropname]) or (tex_base.."_"..tierCount.."_"..tierStep.."_"..tier..".png")
+	
+	local gg = g2
+	if tier == 1 then
+		gg = g
+	end
+	
+	local height = -0.4
+	if tierCount > 1 and tier < tierCount then
+		height = 0.5
+	end
+	
+	def.step_len[step+1] = def.step_len[step+1] or 1
+	
+	local sbox = {
+		type = "fixed",
+		fixed = {-0.5, -0.5, -0.5, 0.5, -0.25, 0.5},
+	}
+	
+	if tierCount > 1 then
+		sbox =  {
+			type = "fixed",
+			fixed = {-5 / 16, -0.5, -5 / 16, 5 / 16, height, 5 / 16},
+		}
+	end
+		
+
+	minetest.register_node(name, {
+		description = "Hops Plant",
+		drawtype = "plantlike_rooted",
+-- 		waving = 1,
+		tiles = {"default_dirt.png^farming_soil_wet.png", "default_dirt.png^farming_soil_wet_side.png"},
+		drop = "default:dirt",
+		special_tiles = {{name = "farming_super_hops_vine.png", tileable_vertical = true}},
+		inventory_image = "farming_super_hops_vine.png",
+		paramtype = "light",
+		paramtype2 = "leveled",
+		place_param2 = 1,
+		groups = {snappy = 3},
+		visual_scale = 1.5,
+		selection_box = {
+			type = "fixed",
+			fixed = {
+					{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+					{-2/16, 0.5, -2/16, 2/16, 3.5, 2/16},
+			},
+		},
+		node_dig_prediction = "default:sand",
+		node_placement_prediction = "",
+		sounds = default.node_sound_sand_defaults({
+			dig = {name = "default_dig_snappy", gain = 0.2},
+			dug = {name = "default_grass_footstep", gain = 0.25},
+		}),
+		
+		
+		after_destruct  = function(pos, oldnode)
+			local n = minetest.get_node(pos)
+	-- 		if n.name == "farming_super:hops_vine_fruit" then 
+	-- 			minetest.set_node(pos, {name = "farming_super:hops_vine", param2 = oldnode.param2})
+			if n.name ~= "farming_super:hops_vine_fruit" then 
+				minetest.set_node(pos, {name = "farming:soil_wet"})
+			end
+		end,
+	})
+	
+	
+	
+	def.next_node = next_node
+-- 	print("def name "..pname)
+	farming_super.registered_plants[base_plant] = def
+	
+	
+	if not def.no_seed then
+
+		local old_grass_drops = deepclone(minetest.registered_items["default:junglegrass"].drop)
+-- 		print('+++++++++++++++++++++++++++++++++++++++++++')
+		table.insert(old_grass_drops.items, 1, {items={mname .. ":seed_" .. pname}, rarity=2})
+		table.sort(old_grass_drops.items, function(a, b) return (b.rarity or 0) < (a.rarity or 0) end)
+		
+		minetest.override_item("default:junglegrass", {drop = old_grass_drops})
+--  		print(dump(minetest.registered_items["default:junglegrass"]))
+
+	end
+	
+	-- Return
+	local r = {
+		seed = mname .. ":seed_" .. pname,
+		harvest = mname .. ":" .. pname
+	}
+	return r
+end

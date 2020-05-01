@@ -2,7 +2,16 @@
 
 
 
+--[[
+TODO:
 
+tension physics on wires
+spots/bugs disease
+check nearby nodes for yellowing decision
+growth and aging of vines
+
+
+]]
 
 
 local grape_speed = {
@@ -182,7 +191,9 @@ for gi,color in ipairs(colors) do
 				{ items = {'farming_super:grape_cutting_'..color}, rarity = 2 },
 			}
 		},
-		groups = {snappy = 1, choppy=2, flammable = 1, grape_stem = 1, not_in_creative_inventory=1},
+		groups = {
+			snappy = 1, choppy=2, flammable = 1, grape_stem = 1, not_in_creative_inventory=1,
+		},
 		sounds = default.node_sound_leaves_defaults(),
 		selection_box = {
 			type = "fixed",
@@ -211,7 +222,10 @@ for gi,color in ipairs(colors) do
 		sunlight_propagates = true,
 -- 		walkable = false,
 		climbable = true,
-		groups = {snappy=1, flammable=1, grape_leaves=1, grape_leaves_bare=1, grape_healthy_leaves=1, not_in_creative_inventory=1},
+		groups = {
+			snappy=1, flammable=1, grape_leaves=1, grape_leaves_bare=1, 
+			grape_healthy_leaves=1, not_in_creative_inventory=1, hangs_from_vines=1, 
+		},
 		grape_color = color,
 		drop = {
 			max_items = 2,
@@ -253,7 +267,10 @@ for gi,color in ipairs(colors) do
 -- 		walkable = false,
 		climbable = true,
 		grape_color = color,
-		groups = {snappy=1, flammable=1, grape_leaves=1, grape_yellow_leaves=1, not_in_creative_inventory=1},
+		groups = {
+			snappy=1, flammable=1, grape_leaves=1, grape_yellow_leaves=1, 
+			not_in_creative_inventory=1, hangs_from_vines=1 
+		},
 		sounds = default.node_sound_leaves_defaults(),
 		selection_box = {
 			type = "fixed",
@@ -278,7 +295,10 @@ for gi,color in ipairs(colors) do
 -- 		walkable = true,
 		climbable = true,
 		grape_color = color,
-		groups = {snappy=1, flammable=1, grape_leaves=1, grape_healthy_leaves=1, not_in_creative_inventory=1},
+		groups = {
+			snappy=1, flammable=1, grape_leaves=1, grape_healthy_leaves=1, 
+			not_in_creative_inventory=1, hangs_from_vines=1 
+		},
 		sounds = default.node_sound_leaves_defaults(),
 		drop = {
 			max_items = 2,
@@ -539,8 +559,8 @@ minetest.register_abm({
 minetest.register_abm({
 	label = "Grape Leaf Disease Origin",
 	nodenames = {"group:grape_healthy_leaves"},
-	interval = 120,
-	chance = 500,
+	interval = 440,
+	chance = 900,
 	action = function(pos)
 		local node = minetest.get_node(pos)
 		local color = minetest.registered_nodes[node.name].grape_color

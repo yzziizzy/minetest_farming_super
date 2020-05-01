@@ -146,3 +146,21 @@ minetest.register_craft({
 })
 
 
+
+
+minetest.register_abm({
+	label = "fall from vines",
+	nodenames = {"group:hangs_from_vines"},
+	interval = 20,
+	chance = 10,
+	action = function(pos, node)
+		pos.y = pos.y + 1
+		local wire = minetest.get_node(pos)
+		if wire.name ~= "farming_super:wire" then
+			pos.y = pos.y - 1
+			minetest.set_node(pos, {name = "air"})
+		end
+	end,
+})
+
+
