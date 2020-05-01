@@ -219,6 +219,29 @@ minetest.register_craftitem("farming_super:orange", {
 	groups = {flammable = 1},
 })
 
+
+minetest.register_node("farming_super:orange_rotten", {
+	description = "Rotten Oranges",
+	tiles = {"farming_super_oranges_overlay_rotten.png"},
+	inventory_image = "farming_super_oranges_overlay_rotten.png",
+	drawtype = "nodebox",
+	groups = {snappy = 3, oddly_breakable_by_hand=3, falling_node = 1,},
+	paramtype = "light",
+	walkable = false,
+	sunlight_propagates = true,
+	buildable_to = true,
+	node_box = {
+		type = "fixed",
+		fixed = {-0.5, -0.5, -0.5, 0.5, -0.475, 0.5},
+	},
+	selection_box = {
+		type = "fixed",
+		fixed = {-0.5, -0.5, -0.5, 0.5, -0.375, 0.5},
+	},
+	on_use = minetest.item_eat(-1),
+-- 	on_place = minetest.rotate_node,
+})
+
 minetest.register_node("farming_super:orange_seed", {
 	description = "Orange Seeds",
 	tiles = {"farming_super_oranges_seed.png"},
@@ -252,6 +275,18 @@ minetest.register_craft({
 		{"default:sword_diamond", "default:sword_diamond"},
 	},
 })
+minetest.register_craft({
+	type = "shapeless",
+	output = "farming_super:orange_seed 2",
+	recipe = {"farming_super:orange_rotten", "group:sword"},
+	replacements = {
+		{"default:sword_wood", "default:sword_wood"},
+		{"default:sword_steel", "default:sword_steel"},
+		{"default:sword_bronze", "default:sword_bronze"},
+		{"default:sword_mese", "default:sword_mese"},
+		{"default:sword_diamond", "default:sword_diamond"},
+	},
+})
 
 	
 local leaf_defs = {
@@ -261,6 +296,7 @@ local leaf_defs = {
 	"default_leaves.png^farming_super_oranges_overlay_2.png",
 	"default_leaves.png^farming_super_oranges_overlay_3.png",
 	"default_leaves.png^farming_super_oranges_overlay_4.png",
+	"default_leaves.png^farming_super_oranges_overlay_rotten.png",
 }
 local leaf_drops = {
 	"farming_super:tree_leaves_1",
@@ -273,6 +309,13 @@ local leaf_drops = {
 		items = {
 			{items={--[["farming_super:tree_leaves_1",]] "farming_super:orange 2"}, rarity = 2},
 			{items={--[["farming_super:tree_leaves_1",]] "farming_super:orange 3"}, rarity = 4},
+		},
+	},
+	{
+		max_items = 1,
+		items = {
+			{items={--[["farming_super:tree_leaves_1",]] "farming_super:orange_rotten 2"}, rarity = 2},
+			{items={--[["farming_super:tree_leaves_1",]] "farming_super:orange_rotten 3"}, rarity = 4},
 		},
 	},
 }
@@ -298,6 +341,7 @@ local leaf_times = { -- time to get to the next stage
 	5,
 	6,
 	7,
+-- 	10,
 }
 
 -- fruiting leaves
@@ -314,8 +358,14 @@ for i,d in pairs(leaf_defs) do
 		groups = {snappy = 3, fs_leafdecay = 3, flammable = 2, leaves = 1},
 		sounds = default.node_sound_leaves_defaults(),
 		leaf_stage = i,
-		
-		on_timer = function(pos, elapsed)
+	}
+	
+	if leaf_punch[i] ~= nil then
+		def.on_punch = leaf_punch[i]
+	end
+	
+	if leaf_times[i] ~= nil then
+		def.on_timer = function(pos, elapsed)
 			local node = minetest.get_node(pos)
 			local def = minetest.registered_nodes[node.name]
 			local stage = def.leaf_stage
@@ -340,18 +390,14 @@ for i,d in pairs(leaf_defs) do
 			stage = stage + 1
 			minetest.set_node(pos, {name="farming_super:tree_leaves_"..stage})
 			minetest.get_node_timer(pos):start(leaf_times[stage])
-		end,
+		end
 		
-		on_place = function(itemstack, placer, pointed_thing)
+		def.on_place = function(itemstack, placer, pointed_thing)
 			local stack = minetest.rotate_node(itemstack, placer, pointed_thing)
 			
 			minetest.get_node_timer(pointed_thing.above):start(leaf_times[i])
 			return stack
-		end,
-	}
-	
-	if leaf_punch[i] ~= nil then
-		def.on_punch = leaf_punch[i]
+		end
 	end
 	
 	minetest.register_node("farming_super:tree_leaves_"..i, def)
@@ -397,6 +443,7 @@ minetest.register_node("farming_super:orange_sapling", {
 
 
 
+
 minetest.register_abm({
 	nodenames = {"farming_super:orange_seed"},
 	interval  = 1,
@@ -413,44 +460,94 @@ minetest.register_abm({
 
 
 minetest.register_abm({
+	nodenames = {"farming_super:tree_leaves_6"}, -- with oranges
+	interval = 5,
+	chance = 20,
+	action = function(pos, node)
+		minetest.set_node(pos, {name="farming_super:tree_leaves_7"})
+	end,
+})
+
+minetest.register_abm({
+	nodenames = {"farming_super:tree_leaves_7"}, -- with rotten oranges
+	interval = 5,
+	chance = 20,
+	action = function(pos, node)
+		minetest.set_node(pos, {name="farming_super:tree_leaves_1"})
+		-- BUG still in root's flowers list
+		
+		for i = 1,12 do
+			pos.y = pos.y - 1
+			local n = minetest.get_node(pos)
+			if n.name ~= "air" and  minetest.get_item_group("leaves",n.name) == 0 then
+				pos.y = pos.y + 1
+				local n2 = minetest.get_node(pos)
+				if n2.name == "air" or minetest.registered_nodes[n2.name].buildable_to then
+					minetest.set_node(pos, {name="farming_super:orange_rotten"})
+					break
+				end
+			end
+		end
+	end,
+})
+
+minetest.register_abm({
 	nodenames = {"group:tree_trunk_root_fertile"},
 	interval  = 30,
 	chance = 1,
 	action = function(pos, node)
 		
+		local gtime = minetest.get_gametime()
+		local time = gtime % (60 * 60)
+		
 		local meta = minetest.get_meta(pos)
 		
-		local stage = meta:get_int("stage")
-		if stage == 0 then stage = 1 end
+		local mode = meta:get_int("mode")
 		
-		local m = stage_data[stage]
-		
-		local raw_leaves = meta:get_string("leaves")
-		local leaves = minetest.deserialize(raw_leaves)
-		if not leaves then
-			return
-		end
-		
-		local raw_flowers = meta:get_string("flowers")
-		local flowers = minetest.deserialize(raw_flowers)
-		if not flowers then
-			flowers = {}
-		else
-			return -- don't re-flower, for debugging
-		end
-		
-		for _,v in ipairs(leaves) do
-			if math.random() < 0.1 * stage then
-				local timer = minetest.get_node_timer(v)
-				if not timer:is_started() then
-					timer:start(leaf_times[1])
-					table.insert(flowers, v)
+		if mode == 0 then -- mode 0 means no flowers or fruit
+			
+			local raw_leaves = meta:get_string("leaves")
+			local leaves = minetest.deserialize(raw_leaves)
+			if not leaves then
+				return
+			end
+			
+			local raw_flowers = meta:get_string("flowers")
+			local flowers = minetest.deserialize(raw_flowers)
+			if not flowers then
+				flowers = {}
+			else
+-- 				return -- don't re-flower, for debugging
+			end
+			
+			
+			local stage = meta:get_int("stage")
+			if stage == 0 then stage = 1 end
+			
+			local m = stage_data[stage]
+			
+			for _,v in ipairs(leaves) do
+				if math.random() < 0.1 * stage then
+					local timer = minetest.get_node_timer(v)
+					if not timer:is_started() then
+						timer:start(leaf_times[1])
+						table.insert(flowers, v)
+					end
 				end
 			end
+			
+			meta:set_string("flowers", minetest.serialize(flowers))
+			meta:set_int("mode", 1)
+		
+		elseif mode == 1 then -- flowering and fruiting
+			
+			
+			meta:set_int("mode", 0)
+		
+		elseif mode == 2 then -- post-fruiting
+		
 		end
-		
-		meta:set_string("flowers", minetest.serialize(flowers))
-		
+			
 	end,
 })
 
