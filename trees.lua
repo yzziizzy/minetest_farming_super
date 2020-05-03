@@ -3,9 +3,21 @@
 
 local orange_speed = {
 	retry = 30,
+	sapling = 500,
+	rand = 20,
+	fruiting = 600,
+	tree_growth = 300,
+}
+
+--[[
+local orange_speed = {
+	retry = 30,
 	sapling = 10,
 	rand = 2,
+	fruiting = 1,
 }
+]]
+
 
 local function gr()
 	return math.random(orange_speed.rand)
@@ -37,43 +49,92 @@ local stage_data = {
 		xrange = 1, zrange = 1,
 		rand = .2,
 		dist = 1.1,
-		time = 10,
+		time = 10 * orange_speed.tree_growth,
 	},
 	[2] = {
 		ymin = 1, ymax=3, ysquash = 2, yoff = 2,
 		xrange = 2, zrange = 2,
 		rand = .6,
 		dist = 1.2,
-		time = 15,
+		time = 15 * orange_speed.tree_growth,
 	},
 	[3] = {
 		ymin = 1, ymax=5, ysquash = 2, yoff = 2,
 		xrange = 3, zrange = 3,
 		rand = 1,
 		dist = 1.6,
-		time = 10,
+		time = 10 * orange_speed.tree_growth,
 	},
 	[4] = {
 		ymin = 1, ymax=6, ysquash = 2, yoff = 2,
 		xrange = 3, zrange = 3,
 		rand = 1,
 		dist = 1.9,
-		time = 15,
+		time = 15 * orange_speed.tree_growth,
 	},
 	[5] = {
 		ymin = 1, ymax = 7, ysquash = 2, yoff = 2,
 		xrange = 4, zrange = 4,
 		rand = 1,
 		dist = 2.1,
-		time = 10,
+		time = 10 * orange_speed.tree_growth,
 	},
 	[6] = {
 		ymin = 1, ymax = 8, ysquash = 2, yoff = 2,
 		xrange = 4, zrange = 4,
 		rand = 1.1,
-		dist = 2.5,
+		dist = 2.5
 	},
 }
+
+
+local function install_tree(pos, stage, meta, leaf_list)
+
+	local m = stage_data[stage]
+	
+	local raw_trunks = meta:get_string("trunks")
+	local trunks = minetest.deserialize(raw_trunks)
+	local raw_leaves = meta:get_string("leaves")
+	local leaves = minetest.deserialize(raw_leaves)
+	if not leaves then
+		leaves = {}
+	end
+	
+	for _,v in ipairs(leaves) do
+		minetest.set_node(v, {name="air"})
+	end
+	
+	for x = -m.xrange,m.xrange do
+	for y = m.ymin,m.ymax do
+	for z = -m.zrange,m.zrange do
+		local y2 = (y-m.yoff) / m.ysquash
+		local d = math.sqrt(x*x + z*z + y2*y2)
+-- 		if d  < (stage/2) +  math.random() then
+		if d  < m.dist +  math.random() * m.rand then
+			local p = {x=pos.x+x, y=pos.y+y, z=pos.z+z}
+			local n = minetest.get_node(p)
+			if n.name == "air" then
+-- 				minetest.set_node(p, {name="farming_super:tree_leaves_1"})
+				minetest.set_node(p, {name=leaf_list[math.random(#leaf_list)]})
+				table.insert(leaves, p)
+			end
+		end
+	end
+	end
+	end
+	
+	
+	minetest.swap_node({x=pos.x, y=pos.y, z=pos.z}, {name="farming_super:tree_trunk_root_"..stage})
+	
+	for i = 1,stage do
+		minetest.set_node({x=pos.x, y=pos.y+i, z=pos.z}, {name="farming_super:tree_trunk_"..stage})
+	end
+	
+	meta:set_string("leaves", minetest.serialize(leaves))
+	meta:set_int("stage", stage + 1)
+
+end
+
 
 
 local function advance_trunk(pos, elapsed)
@@ -104,49 +165,25 @@ local function advance_trunk(pos, elapsed)
 	
 	m = stage_data[stage]
 	
-	local raw_trunks = meta:get_string("trunks")
-	local trunks = minetest.deserialize(raw_trunks)
-	local raw_leaves = meta:get_string("leaves")
-	local leaves = minetest.deserialize(raw_leaves)
-	if not leaves then
-		leaves = {}
-	end
-	
-	for _,v in ipairs(leaves) do
-		minetest.set_node(v, {name="air"})
-	end
-	
-	for x = -m.xrange,m.xrange do
-	for y = m.ymin,m.ymax do
-	for z = -m.zrange,m.zrange do
-		local y2 = (y-m.yoff) / m.ysquash
-		local d = math.sqrt(x*x + z*z + y2*y2)
--- 		if d  < (stage/2) +  math.random() then
-		if d  < m.dist +  math.random() * m.rand then
-			local p = {x=pos.x+x, y=pos.y+y, z=pos.z+z}
-			local n = minetest.get_node(p)
-			if n.name == "air" then
-				minetest.set_node(p, {name="farming_super:tree_leaves_1"})
-				table.insert(leaves, p)
-			end
-		end
-	end
-	end
-	end
-	
-	
-	minetest.swap_node({x=pos.x, y=pos.y, z=pos.z}, {name="farming_super:tree_trunk_root_"..stage})
-	
-	for i = 1,stage do
-		minetest.set_node({x=pos.x, y=pos.y+i, z=pos.z}, {name="farming_super:tree_trunk_"..stage})
-	end
-	
-	meta:set_string("leaves", minetest.serialize(leaves))
-	meta:set_int("stage", stage + 1)
+	install_tree(pos, stage, meta, {"farming_super:tree_leaves_1"})
 	
 	if stage < 6 then
 		minetest.get_node_timer(pos):start(m.time)
 	end
+end
+
+
+local function install_mapgen_tree(pos)
+	local stage = math.random(1,6)
+	local meta = minetest.get_meta(pos)
+	
+	install_tree(pos, stage, meta, {"farming_super:tree_leaves_1", "farming_super:tree_leaves_1", "farming_super:tree_leaves_6"})
+	
+	local m = stage_data[stage]
+	if stage < 6 then
+		minetest.get_node_timer(pos):start(m.time)
+	end
+	
 end
 
 
@@ -174,14 +211,15 @@ for sz = 1,6 do
 		on_place = function(itemstack, placer, pointed_thing)
 			local stack = minetest.rotate_node(itemstack, placer, pointed_thing)
 			
-			minetest.get_node_timer(pointed_thing.above):start(5)
+			local m = stage_data[sz]
+			if m.time then
+				minetest.get_node_timer(pointed_thing.above):start(m.time)
+			end
 			return stack
 		end,
 		
 		on_timer = function(pos, elapsed)
 			advance_trunk(pos, elapsed)
-			
-			
 		end,
 	})
 	
@@ -335,12 +373,12 @@ local leaf_punch = {
 }
 
 local leaf_times = { -- time to get to the next stage
-	2,
-	3,
-	4,
-	5,
-	6,
-	7,
+	2 * orange_speed.fruiting,
+	3 * orange_speed.fruiting,
+	4 * orange_speed.fruiting,
+	5 * orange_speed.fruiting,
+	6 * orange_speed.fruiting,
+	7 * orange_speed.fruiting,
 -- 	10,
 }
 
@@ -446,8 +484,8 @@ minetest.register_node("farming_super:orange_sapling", {
 
 minetest.register_abm({
 	nodenames = {"farming_super:orange_seed"},
-	interval  = 1,
-	chance = 3,
+	interval  = 41,
+	chance = 50,
 	action = function(pos, node)
 		pos.y = pos.y - 1
 		local n = minetest.get_node(pos)
@@ -461,8 +499,8 @@ minetest.register_abm({
 
 minetest.register_abm({
 	nodenames = {"farming_super:tree_leaves_6"}, -- with oranges
-	interval = 5,
-	chance = 20,
+	interval = 60,
+	chance = 120,
 	action = function(pos, node)
 		minetest.set_node(pos, {name="farming_super:tree_leaves_7"})
 	end,
@@ -470,8 +508,8 @@ minetest.register_abm({
 
 minetest.register_abm({
 	nodenames = {"farming_super:tree_leaves_7"}, -- with rotten oranges
-	interval = 5,
-	chance = 20,
+	interval = 60,
+	chance = 120,
 	action = function(pos, node)
 		minetest.set_node(pos, {name="farming_super:tree_leaves_1"})
 		-- BUG still in root's flowers list
@@ -493,7 +531,7 @@ minetest.register_abm({
 
 minetest.register_abm({
 	nodenames = {"group:tree_trunk_root_fertile"},
-	interval  = 30,
+	interval  = 60 * 10,
 	chance = 1,
 	action = function(pos, node)
 		
@@ -542,6 +580,7 @@ minetest.register_abm({
 		elseif mode == 1 then -- flowering and fruiting
 			
 			
+			meta:set_string("flowers", minetest.serialize({}))
 			meta:set_int("mode", 0)
 		
 		elseif mode == 2 then -- post-fruiting
@@ -551,3 +590,51 @@ minetest.register_abm({
 	end,
 })
 
+
+
+minetest.register_node("farming_super:orange_tree_mapgen", {
+	description = "Orange Tree Mapgen Node",
+-- 	drawtype= "airlike",
+	paramtype = "light",
+	groups = { },
+	drop = "",
+})
+
+
+minetest.register_lbm({
+	name = "farming_super:orange_tree_mapgen",
+	nodenames = {"farming_super:orange_tree_mapgen"},
+	catch_up = true,
+	action = function(pos, node)
+		install_mapgen_tree(pos)
+	end,
+})
+
+minetest.register_abm({
+	nodenames = {"farming_super:orange_tree_mapgen"},
+	interval  = 5,
+	chance = 1,
+	catch_up = true,
+	action = function(pos, node)
+		install_mapgen_tree(pos)
+	end,
+})
+
+minetest.register_decoration({
+	name = "farming_super:orange_tree_mapgen",
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass"},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.008,
+		scale = 0.01,
+		spread = {x = 200, y = 200, z = 200},
+		seed = 567446,
+		octaves = 3,
+		persist = 0.7
+	},
+	biomes = {"grassland", "deciduous_forest"},
+	y_max = 80,
+	y_min = 1,
+	decoration = "farming_super:orange_tree_mapgen",
+})
