@@ -9,6 +9,7 @@ dofile(modpath.."/vines.lua")
 dofile(modpath.."/hops.lua")
 dofile(modpath.."/grapes.lua")
 dofile(modpath.."/trees.lua")
+dofile(modpath.."/durian.lua")
 
 
 
@@ -82,9 +83,11 @@ fruit trees
 	pears
 	durian, jackfruit
 fruit flies
-rotten fruit on the ground
+rotten fruit on the ground converts dirt
 tree hybrids
 smudge pots
+keep flower level on tree growth
+
 vinegar
 
 scythe for harvesting larger squares
