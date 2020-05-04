@@ -1,6 +1,15 @@
 
 
 
+local durian_speed = {
+	sapling = 500,
+	rand = 60,
+}
+
+local function gr()
+	return math.random(durian_speed.rand)
+end
+
 minetest.register_node("farming_super:jackfruit", {
 	description = "Jackfruit",
 	tiles = {"default_cactus_side.png"},
@@ -192,9 +201,10 @@ minetest.register_node("farming_super:durian_top", {
 		type = "fixed",
 		connect_top = {{-0.20*.7, -.3*.7, -0.20*.7, 0.20*.7, .43*.7, 0.20*.7},},
 	},
+	drop = "farming_super:durian",
 	sunlight_propagates = true,
 	is_ground_content = false,
-	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 2, plant = 1},
+	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 2, plant = 1, durian_fruit=1},
 	sounds = default.node_sound_wood_defaults(),
 })
 
@@ -223,10 +233,11 @@ minetest.register_node("farming_super:durian_side", {
 		type = "fixed",
 		fixed = {{(-0.20)*.7, (-.3)*.7, (-0.20-.3)*.7, (0.20)*.7, (.43)*.7, (0.20-.3)*.7},},
 	},
+	drop = "farming_super:durian",
 	connects_to = {"group:tree"},
 	sunlight_propagates = true,
 	is_ground_content = false,
-	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 2, plant = 1},
+	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 2, plant = 1, durian_fruit=1},
 	sounds = default.node_sound_wood_defaults(),
 })
 
@@ -241,7 +252,20 @@ minetest.register_node("farming_super:durian_tree", {
 	drop = "default:tree",
 	groups = {tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2},
 	sounds = default.node_sound_wood_defaults(),
-	on_place = minetest.rotate_node
+	on_place = minetest.rotate_node,
+	after_destruct = function(pos)
+		local durians = minetest.find_nodes_in_area(
+			vector.subtract(pos, {x=-1, y=-1, z=-1}),
+			vector.subtract(pos, {x=1, y=0, z=1}),
+			"group:durian_fruit"
+		)
+		
+		for _,p in ipairs(durians) do
+			minetest.set_node(p, {name="air"})
+			minetest.add_item(p, {name="farming_super:durian"})
+		end
+		
+	end,
 })
 
 
@@ -255,13 +279,6 @@ minetest.register_node("farming_super:durian_leaves", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1},
--- 	drop = {
--- 		max_items = 1,
--- 		items = {
--- 			{items = {"default:acacia_sapling"}, rarity = 20},
--- 			{items = {"default:acacia_leaves"}}
--- 		}
--- 	},
 	sounds = default.node_sound_leaves_defaults(),
 })
 
@@ -277,20 +294,19 @@ local function not_air(pos)
 end
 
 
-local function durian_tree(pos)
+local function durian_tree(pos, nodes)
 	local oy = pos.y
 	
-	minetest.set_node(pos, {name="farming_super:durian_tree"})
+	minetest.set_node(pos, {name=nodes.tree})
 	
 	for j = 1,4 do
 		pos.y = pos.y + 1
 		
 		if not_air(pos) then
-			print("not air")
 			return
 		end
 		
-		minetest.set_node(pos, {name="farming_super:durian_tree"})
+		minetest.set_node(pos, {name=nodes.tree})
 	end
 	
 	local dirs = {
@@ -312,7 +328,7 @@ local function durian_tree(pos)
 				return
 			end
 			minetest.set_node(d, {
-				name="farming_super:durian_tree",
+				name = nodes.tree,
 				param2 = fdirs[rd] --minetest.dir_to_facedir(1)
 			})
 			d = vector.add(d, dir)
@@ -326,7 +342,7 @@ local function durian_tree(pos)
 		
 		for _,p in ipairs(airs) do
 			if vector.distance(p, d) - math.random() < 1.6 and not not_air(p) then
-				minetest.set_node(p, {name="farming_super:durian_leaves"})
+				minetest.set_node(p, {name=nodes.leaves})
 			end
 		end
 	end
@@ -340,11 +356,10 @@ local function durian_tree(pos)
 			pos.y = pos.y + 1
 			
 			if not_air(pos) then
-				print("not air")
 				return
 			end
 			
-			minetest.set_node(pos, {name="farming_super:durian_tree"})
+			minetest.set_node(pos, {name = nodes.tree})
 		end
 		
 		branch(pos)
@@ -353,8 +368,61 @@ local function durian_tree(pos)
 	
 end
 
+minetest.register_node("farming_super:durian_sapling", {
+	description = "Durian Sapling",
+	drawtype = "plantlike",
+	waving = 1,
+	visual_scale = 1.69,
+	tiles = {"farming_super_durian_sapling.png"},
+	inventory_image = "farming_super_durian_sapling.png",
+	paramtype = "light",
+-- 	paramtype2 = "meshoptions",
+	sunlight_propagates = true,
+	walkable = false,
+	buildable_to = false,
+	grape_color = color,
+	groups = {snappy = 2, oddly_breakable_by_hand = 2, flammable = 1, attached_node=1, durian_sapling=1},
+	sounds = default.node_sound_leaves_defaults(),
+	selection_box = {
+		type = "fixed",
+		fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 1.3, 6 / 16},
+	},
+-- 	place_param2 = 1,
+	
+	on_place = function(itemstack, placer, pointed_thing)
+		local n = minetest.get_node(pointed_thing.above)
+		if n.name ~= "farming_super:durian_sapling" and (n.name == "air" or minetest.registered_nodes[n.name].buildable_to) then
+			minetest.set_node(pointed_thing.above, {name="farming_super:durian_sapling"})
+			
+			local timer = minetest.get_node_timer(pointed_thing.above)
+			timer:start(durian_speed.sapling + gr())
+-- 			timer:start(10)
+			
+			itemstack:take_item(1)
+		end
+		
+		return itemstack
+	end,
+	
+	on_timer = function(pos, elapsed)
+		local node = minetest.get_node(pos)
+		
+		pos.y = pos.y - 1
+		local soil = minetest.get_node(pos)
+		
+		if minetest.get_item_group(soil.name, "soil") <= 0 then
+			return
+		end
+		pos.y = pos.y + 1
+		
+		durian_tree(pos, {
+			tree = "farming_super:durian_tree",
+			leaves = "farming_super:durian_leaves",
+		})
+	end,
+})
 
-
+--[[
 minetest.register_node("farming_super:durian_tree_seed", {
 	description = "Durian Tree Seed",
 	tiles = {"default_tree_top.png", "default_tree_top.png", "default_tree.png"},
@@ -365,18 +433,21 @@ minetest.register_node("farming_super:durian_tree_seed", {
 	sounds = default.node_sound_wood_defaults(),
 	on_place = function(itemstack, placer, pointed_thing)
 		local p = pointed_thing.above
-		durian_tree(p)
+		durian_tree(p, {
+			tree = "farming_super:durian_tree",
+			leaves = "farming_super:durian_leaves",
+		})
 	end,
 })
-
+]]
 
 
 minetest.register_abm({
-	label = "durian grows",
+	label = "durian grows fruit",
 	neighbors = {"farming_super:durian_tree"},
 	nodenames = {"air"},
-	interval = 1,
-	chance = 30,
+	interval = 30,
+	chance = 300,
 	action = function(pos, node)
 		local tree = minetest.find_node_near(pos, 1, "farming_super:durian_tree")
 		if not tree then
@@ -406,4 +477,112 @@ minetest.register_abm({
 			param2 = minetest.dir_to_facedir(vector.subtract(pos, tree))
 		})
 	end,
+})
+
+
+
+minetest.register_node("farming_super:durian_seed", {
+	description = "Durian Seeds",
+	tiles = {"farming_super_durian_seed.png"},
+	inventory_image = "farming_super_durian_seed.png",
+	drawtype = "signlike",
+	groups = {seed = 1, snappy = 3, attached_node = 1, flammable = 2},
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	walkable = false,
+	sunlight_propagates = true,
+	selection_box = {
+		type = "fixed",
+		fixed = {-0.5, -0.5, -0.5, 0.5, -0.375, 0.5},
+	},
+	sounds = default.node_sound_dirt_defaults({
+		dig = {name = "", gain = 0},
+		dug = {name = "default_grass_footstep", gain = 0.2},
+		place = {name = "default_place_node", gain = 0.25},
+	}),
+})
+
+
+minetest.register_craft({
+	type = "shapeless",
+	output = "farming_super:durian_seed 3",
+	recipe = {"farming_super:durian", "group:sword"},
+	replacements = {
+		{"default:sword_wood", "default:sword_wood"},
+		{"default:sword_steel", "default:sword_steel"},
+		{"default:sword_bronze", "default:sword_bronze"},
+		{"default:sword_mese", "default:sword_mese"},
+		{"default:sword_diamond", "default:sword_diamond"},
+	},
+})
+
+
+
+minetest.register_abm({
+	nodenames = {"farming_super:durian_seed"},
+	interval  = 41,
+	chance = 50,
+	action = function(pos, node)
+		pos.y = pos.y - 1
+		local n = minetest.get_node(pos)
+		if n.name == "farming:soil_wet" then
+			pos.y = pos.y + 1
+			minetest.set_node(pos, {name="farming_super:durian_sapling"})
+		end
+	end,
+})
+
+
+
+minetest.register_node("farming_super:durian_tree_mapgen", {
+	description = "Durian Tree Mapgen Node",
+-- 	drawtype= "airlike",
+	paramtype = "light",
+	groups = { },
+	drop = "",
+})
+
+
+minetest.register_lbm({
+	name = "farming_super:durian_tree_mapgen",
+	nodenames = {"farming_super:durian_tree_mapgen"},
+	catch_up = true,
+	action = function(pos, node)
+		durian_tree(pos, {
+			tree = "farming_super:durian_tree",
+			leaves = "farming_super:durian_leaves",
+		})
+	end,
+})
+
+minetest.register_abm({
+	nodenames = {"farming_super:durian_tree_mapgen"},
+	interval  = 5,
+	chance = 1,
+	catch_up = true,
+	action = function(pos, node)
+		durian_tree(pos, {
+			tree = "farming_super:durian_tree",
+			leaves = "farming_super:durian_leaves",
+		})
+	end,
+})
+
+minetest.register_decoration({
+	name = "farming_super:durian_tree_mapgen",
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass", "default:dirt_with_rainforest_litter"},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.008,
+		scale = 0.01,
+		spread = {x = 200, y = 200, z = 200},
+		seed = 567446,
+		octaves = 3,
+		persist = 0.7
+	},
+	biomes = {"rainforest", "rainforest_ocean", "rainforest_swamp"},
+	y_max = 40,
+	y_min = 1,
+	decoration = "farming_super:durian_tree_mapgen",
 })

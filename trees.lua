@@ -517,7 +517,7 @@ minetest.register_abm({
 		for i = 1,12 do
 			pos.y = pos.y - 1
 			local n = minetest.get_node(pos)
-			if n.name ~= "air" and  minetest.get_item_group("leaves",n.name) == 0 then
+			if n.name ~= "air" and  minetest.get_item_group(n.name, "leaves") == 0 then
 				pos.y = pos.y + 1
 				local n2 = minetest.get_node(pos)
 				if n2.name == "air" or minetest.registered_nodes[n2.name].buildable_to then
