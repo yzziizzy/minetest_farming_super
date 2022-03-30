@@ -1,4 +1,0 @@
-default
-vessels
-farming?
-seasons?
