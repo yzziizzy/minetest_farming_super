@@ -1131,7 +1131,7 @@ minetest.register_node("farming_super:test", {
 	sunlight_propagates = true,
 -- 	walkable = false,
 	buildable_to = false,
-	grape_color = color,
+	--grape_color = color,
 	groups = {snappy = 2, plant=1, oddly_breakable_by_hand = 1, },
 	sounds = default.node_sound_leaves_defaults(),
 	selection_box = {

@@ -262,6 +262,7 @@ minetest.register_node("farming_super:orange_rotten", {
 	description = "Rotten Oranges",
 	tiles = {"farming_super_oranges_overlay_rotten.png"},
 	inventory_image = "farming_super_oranges_overlay_rotten.png",
+	use_texture_alpha = "clip",
 	drawtype = "nodebox",
 	groups = {snappy = 3, oddly_breakable_by_hand=3, falling_node = 1,},
 	paramtype = "light",

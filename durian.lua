@@ -380,7 +380,6 @@ minetest.register_node("farming_super:durian_sapling", {
 	sunlight_propagates = true,
 	walkable = false,
 	buildable_to = false,
-	grape_color = color,
 	groups = {snappy = 2, oddly_breakable_by_hand = 2, flammable = 1, attached_node=1, durian_sapling=1},
 	sounds = default.node_sound_leaves_defaults(),
 	selection_box = {
@@ -577,7 +576,7 @@ minetest.register_decoration({
 		offset = -0.008,
 		scale = 0.01,
 		spread = {x = 200, y = 200, z = 200},
-		seed = 567446,
+		seed = 765345,
 		octaves = 3,
 		persist = 0.7
 	},

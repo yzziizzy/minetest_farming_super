@@ -534,8 +534,9 @@ farming_super.register_plant = function(name, def)
 				--print(name.."-> ".. tier .. " / "..tierCount .. " " ..height)
 				minetest.register_node(name, {
 					drawtype = "plantlike",
-					waving = false,
+					waving = 0,
 					tiles = {tex},
+					use_texture_alpha = "clip",
 					paramtype = "light",
 					paramtype2 = def.paramtype2 or nil,
 					place_param2 = def.place_param2 or nil,
