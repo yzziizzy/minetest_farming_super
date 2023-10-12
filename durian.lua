@@ -445,14 +445,13 @@ minetest.register_abm({
 	label = "durian grows fruit",
 	neighbors = {"farming_super:durian_tree"},
 	nodenames = {"air"},
-	interval = 30,
-	chance = 300,
+	interval = 3,--0,
+	chance = 3,--00,
 	action = function(pos, node)
 		local tree = minetest.find_node_near(pos, 1, "farming_super:durian_tree")
 		if not tree then
 			return
 		end
-		
 		
 		-- none above
 		if tree.y < pos.y then
@@ -462,6 +461,14 @@ minetest.register_abm({
 		if tree.y == pos.y and tree.x ~= pos.x and tree.z ~= pos.z then
 			return
 		end
+		
+		local fruits = minetest.find_nodes_in_area(
+			vector.subtract(pos, {x=-2, y=-2, z=-2}),
+			vector.subtract(pos, {x=2, y=2, z=2}),
+			"group:durian_fruit"
+		)
+		
+		if #fruits > 2 then return end
 		
 		if tree.y > pos.y then
 			if tree.x ~= pos.x or tree.z ~= pos.z then
@@ -573,12 +580,12 @@ minetest.register_decoration({
 	place_on = {"default:dirt_with_grass", "default:dirt_with_rainforest_litter"},
 	sidelen = 16,
 	noise_params = {
-		offset = -0.008,
-		scale = 0.01,
+		offset = -0.002,
+		scale = 0.03,
 		spread = {x = 200, y = 200, z = 200},
 		seed = 765345,
 		octaves = 3,
-		persist = 0.7
+		persist = 0.8
 	},
 	biomes = {"rainforest", "rainforest_ocean", "rainforest_swamp"},
 	y_max = 40,

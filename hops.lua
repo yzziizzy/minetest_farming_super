@@ -76,6 +76,26 @@ minetest.register_node("farming_super:hops_vine", {
 })
 
 
+minetest.register_decoration({
+	name = "farming_super:hops_vine",
+	deco_type = "simple",
+	place_on = {"default:dirt_with_coniferous_litter"},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.002,
+		scale = 0.03,
+		spread = {x = 200, y = 200, z = 200},
+		seed = 56784,
+		octaves = 3,
+		persist = 0.8
+	},
+	biomes = {"coniferous_forest"},
+	y_max = 140,
+	y_min = 20,
+	decoration = "farming_super:hops_vine",
+	--decoration = "default:mese_block",
+})
+
 
 minetest.register_node("farming_super:hops_vine_fruit", {
 	description = "Hops Plant with Flowers",

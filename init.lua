@@ -126,9 +126,9 @@ minetest.register_craft({
 local corndrop = {
 	max_items = 6,
 	items = {
-		{ items = {'farming_super:seed_corn'} },
-		{ items = {'farming_super:seed_corn'}, rarity = 2},
-		{ items = {'farming_super:seed_corn'}, rarity = 5},
+	--	{ items = {'farming_super:seed_corn'} },
+	--	{ items = {'farming_super:seed_corn'}, rarity = 2},
+	--	{ items = {'farming_super:seed_corn'}, rarity = 3},
 		{ items = {'farming_super:corn 2'} },
 		{ items = {'farming_super:corn'}, rarity = 2 },
 		{ items = {'farming_super:corn'}, rarity = 5 }
@@ -188,8 +188,8 @@ farming_super.register_plant("farming_super:corn_sm", {
 		p2s4t1 = {
 			max_items = 4,
 			items = {
-				{ items = {'farming_super:seed_corn'} },
-				{ items = {'farming_super:seed_corn'}, rarity = 5},
+			--	{ items = {'farming_super:seed_corn'} },
+			--	{ items = {'farming_super:seed_corn'}, rarity = 5},
 				{ items = {'farming_super:corn '} },
 				{ items = {'farming_super:corn'}, rarity = 5 }
 			}
@@ -253,27 +253,41 @@ farming_super.register_plant("farming_super:corn_lg", {
 })
 
 
---[[
+
 minetest.register_decoration({
 	name = "farming_super:corn_sm",
-	deco_type = "simple",
-	place_on = {"default:dry_dirt_with_dry_grass", "default:dry_dirt"},
+	deco_type = "schematic",
+	place_on = {"default:dry_dirt_with_dry_grass", "default:dry_dirt", "default:dirt_with_grass"},
 	sidelen = 16,
 	noise_params = {
-		offset = -0.0003,
+		offset = 0.0003,
 		scale = 0.0009,
 		spread = {x = 200, y = 200, z = 200},
-		seed = 9752,
+		seed = 7512,
 		octaves = 3,
 		persist = 0.6
 	},
-	biomes = {"savanna",},
+	biomes = {"savanna", "grassland"},
 	y_max = 128,
 	y_min = 5,
-	decoration = "farming_super:corn_sm",
-	param2 = 3,
+	place_offset_y = 1,
+	schematic = {
+		size = {x = 1, y = 2, z = 1},
+		data = {
+			{name = "farming_super:corn_sm_7_1", param2 = 2},
+			{name = "farming_super:corn_sm_7_2", param2 = 2},
+		},
+	},
+	param2 = 2,
+	flags = "force_placement", -- make sure the lower part isn't missing because of a prior decoration
 })
-]]
+
+minetest.register_craft({
+	output = "farming_super:seed_corn 10",
+	type = "shapeless",
+	recipe = {"farming_super:corn"},
+})
+
 
 -- standard soybeans
 farming_super.register_plant("farming_super:soybeans", {
@@ -298,7 +312,7 @@ farming_super.register_plant("farming_super:soybeans", {
 	minlight = 13,
 	maxlight = 15,
 	fertility = {"grassland"},
-	groups = {flammable = 4, fix_nitrogen = 1},
+	groups = {flammable = 4, fix_nitrogen = 2},
 })
 
 
@@ -346,9 +360,9 @@ farming_super.register_plant("farming_super:onion_white", {
 		p1s4t1 = {
 			max_items = 4,
 			items = {
-				{ items = {'farming_super:seed_white_onion'} },
-				{ items = {'farming_super:seed_white_onion'}, rarity = 2},
-				{ items = {'farming_super:seed_white_onion'}, rarity = 5},
+				{ items = {'farming_super:seed_onion_white'} },
+				{ items = {'farming_super:seed_onion_white'}, rarity = 2},
+				{ items = {'farming_super:seed_onion_white'}, rarity = 5},
 				{ items = {'farming_super:onion_white'} },
 			}
 		}, 
@@ -377,9 +391,9 @@ farming_super.register_plant("farming_super:onion_red", {
 		p1s4t1 = {
 			max_items = 4,
 			items = {
-				{ items = {'farming_super:seed_red_onion'} },
-				{ items = {'farming_super:seed_red_onion'}, rarity = 2},
-				{ items = {'farming_super:seed_red_onion'}, rarity = 5},
+				{ items = {'farming_super:seed_onion_red'} },
+				{ items = {'farming_super:seed_onion_red'}, rarity = 2},
+				{ items = {'farming_super:seed_onion_red'}, rarity = 5},
 				{ items = {'farming_super:onion_red'} },
 			}
 		}, 
@@ -404,7 +418,7 @@ minetest.register_decoration({
 		offset = -0.0002,
 		scale = 0.0009,
 		spread = {x = 200, y = 200, z = 200},
-		seed = 2548,
+		seed = 2248,
 		octaves = 3,
 		persist = 0.6
 	},
@@ -519,13 +533,11 @@ farming_super.register_plant("farming_super:soybeans", {
 	default_drop = {},
 	drops = {
 		p1s5t1 = {
-			max_items = 5,
+			max_items = 3,
 			items = {
-				{ items = {'farming_super:seed_soybeans'} },
-				{ items = {'farming_super:seed_soybeans'}, rarity = 2},
-				{ items = {'farming_super:seed_soybeans'}, rarity = 5},
 				{ items = {'farming_super:soybeans 2'} },
-				{ items = {'farming_super:soybeans'}, rarity = 3 }
+				{ items = {'farming_super:soybeans'}, rarity = 3 },
+				{ items = {'farming_super:soybeans'}, rarity = 5 },
 			}
 		}, 
 	},
@@ -535,6 +547,11 @@ farming_super.register_plant("farming_super:soybeans", {
 	groups = {flammable = 4, fix_nitrogen = 1},
 })
 
+minetest.register_craft({
+	output = "farming_super:seed_soybeans 3",
+	type = "shapeless",
+	recipe = {"farming_super:soybeans"},
+})
 
 minetest.register_decoration({
 	name = "farming_super:soybeans_5_1",
@@ -598,7 +615,7 @@ minetest.register_decoration({
 	place_on = {"default:dirt_with_rainforest_litter",},
 	sidelen = 16,
 	noise_params = {
-		offset = -0.0003,
+		offset = 0.0003,
 		scale = 0.0009,
 		spread = {x = 200, y = 200, z = 200},
 		seed = 5278,
@@ -654,7 +671,7 @@ minetest.register_decoration({
 	place_on = {"default:dirt_with_rainforest_litter",},
 	sidelen = 16,
 	noise_params = {
-		offset = -0.0003,
+		offset = 0.0003,
 		scale = 0.0009,
 		spread = {x = 200, y = 200, z = 200},
 		seed = 8743,
@@ -709,7 +726,7 @@ minetest.register_decoration({
 	place_on = {"default:dirt_with_coniferous_litter",},
 	sidelen = 16,
 	noise_params = {
-		offset = -0.0003,
+		offset = 0.0003,
 		scale = 0.0009,
 		spread = {x = 200, y = 200, z = 200},
 		seed = 4782,
@@ -745,10 +762,10 @@ farming_super.register_plant("farming_super:daikon", {
 		p1s4t1 = {
 			max_items = 4,
 			items = {
-				{ items = {'farming_super:seed_daikon'} },
+				{ items = {'farming_super:seed_daikon 2'} },
 				{ items = {'farming_super:seed_daikon'}, rarity = 2},
-				{ items = {'farming_super:seed_daikon'}, rarity = 5},
-				{ items = {'farming_super:daikon 4'} },
+				{ items = {'farming_super:seed_daikon 2'}, rarity = 5},
+				{ items = {'farming_super:daikon 1'} },
 			}
 		}, 
 	},
@@ -765,7 +782,7 @@ minetest.register_decoration({
 	place_on = {"default:dirt_with_jungle_litter",},
 	sidelen = 16,
 	noise_params = {
-		offset = -0.0003,
+		offset = 0.0003,
 		scale = 0.0009,
 		spread = {x = 200, y = 200, z = 200},
 		seed = 7362,

@@ -17,9 +17,9 @@ growth and aging of vines
 local grape_speed = {
 	rand = 60,
 	retry = 30,
-	cutting = 1600,
-	sapling = 2800,
-	fruit = 1000,
+	cutting = 500,
+	sapling = 1000,
+	fruit = 800,
 	leaf_regrowth = 40,
 	wine = 60*60*2,
 }
@@ -187,7 +187,7 @@ for gi,color in ipairs(colors) do
 		drop = {
 			max_items = 2,
 			items = {
-				{ items = {'farming_super:grape_cutting_'..color}, },
+				{ items = {'farming_super:grape_cutting_'..color..' 2'}, },
 				{ items = {'farming_super:grape_cutting_'..color}, rarity = 2 },
 			}
 		},
@@ -231,8 +231,8 @@ for gi,color in ipairs(colors) do
 			max_items = 2,
 			items = {
 				{ items = {'farming_super:grape_leaves 1'} },
-				{ items = {'farming_super:grape_leaves 1'}, rarity = 4 },
-				{ items = {'farming_super:grape_cutting_'..color}, rarity = 10 },
+				{ items = {'farming_super:grape_leaves 1'}, rarity = 3 },
+				{ items = {'farming_super:grape_cutting_'..color}, rarity = 5 },
 			}
 		},
 		sounds = default.node_sound_leaves_defaults(),

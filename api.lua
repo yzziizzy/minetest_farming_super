@@ -41,7 +41,7 @@ end
 
 
 
-local base_speed = 350
+local base_speed = 200
 
 -- how often node timers for plants will tick, +/- some random value
 local function tick(pos, mul)
@@ -542,6 +542,7 @@ farming_super.register_plant = function(name, def)
 					place_param2 = def.place_param2 or nil,
 					walkable = false,
 					buildable_to = true,
+					sunlight_propagates = true,
 					drop = drops,
 					selection_box = sbox,
 					groups = gg,
@@ -672,7 +673,7 @@ farming_super.register_plant = function(name, def)
 	end
 	]]
 
-	--[[
+	
 	-- replacement LBM for pre-nodetimer plants
 	minetest.register_lbm({
 		name = ":" .. mname .. ":start_nodetimer_" .. pname,
@@ -681,7 +682,7 @@ farming_super.register_plant = function(name, def)
 			tick_again(pos)
 		end,
 	})
-	]]
+	
 
 	-- Return
 	local r = {
